@@ -6,12 +6,105 @@
 class Client
 {
     /**
+     * Agregar atributo full_name a cliente(s)
+     * @param array|array[]|false $data Cliente individual, array de clientes, o false si no se encuentra
+     * @return array|array[]|false Cliente(s) con atributo full_name agregado, o false si no se encuentra
+     */
+    private static function addFullName($data)
+    {
+        // Si no hay datos o es false, retornar tal cual
+        if (empty($data) || $data === false) {
+            return $data;
+        }
+
+        // Si es un array de clientes (array multidimensional)
+        if (isset($data[0]) && is_array($data[0])) {
+            foreach ($data as &$client) {
+                $client['full_name'] = trim(($client['first_name'] ?? '') . ' ' . ($client['last_name'] ?? ''));
+            }
+            return $data;
+        }
+
+        // Si es un cliente individual
+        if (is_array($data)) {
+            $data['full_name'] = trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? ''));
+        }
+        
+        return $data;
+    }
+
+    /**
+     * Agregar atributo full_address a cliente(s)
+     * @param array|array[]|false $data Cliente individual, array de clientes, o false si no se encuentra
+     * @return array|array[]|false Cliente(s) con atributo full_address agregado, o false si no se encuentra
+     */
+    private static function addFullAddress($data)
+    {
+        // Si no hay datos o es false, retornar tal cual
+        if (empty($data) || $data === false) {
+            return $data;
+        }
+
+        // Si es un array de clientes (array multidimensional)
+        if (isset($data[0]) && is_array($data[0])) {
+            foreach ($data as &$client) {
+                $client['full_address'] = self::buildFullAddress($client);
+            }
+            return $data;
+        }
+
+        // Si es un cliente individual
+        if (is_array($data)) {
+            $data['full_address'] = self::buildFullAddress($data);
+        }
+        
+        return $data;
+    }
+
+    /**
+     * Construir dirección completa a partir de los campos del cliente
+     * @param array $client Datos del cliente
+     * @return string Dirección completa formateada
+     */
+    private static function buildFullAddress($client)
+    {
+        $parts = [];
+        
+        if (!empty($client['address'])) {
+            $parts[] = trim($client['address']);
+        }
+        
+        if (!empty($client['city'])) {
+            $parts[] = trim($client['city']);
+        }
+        
+        $stateZip = [];
+        if (!empty($client['state'])) {
+            $stateZip[] = trim($client['state']);
+        }
+        if (!empty($client['zip_code'])) {
+            $stateZip[] = trim($client['zip_code']);
+        }
+        if (!empty($stateZip)) {
+            $parts[] = implode(' ', $stateZip);
+        }
+        
+        if (!empty($client['country'])) {
+            $parts[] = trim($client['country']);
+        }
+        
+        return implode(', ', $parts);
+    }
+
+    /**
      * Obtener todos los clientes
      */
     public static function all()
     {
         $repo = new ClientRepository();
-        return $repo->findAll([], 'created_at DESC');
+        $clients = $repo->findAll([], 'created_at DESC');
+        $clients = self::addFullName($clients);
+        return self::addFullAddress($clients);
     }
 
     /**
@@ -20,7 +113,12 @@ class Client
     public static function find($id)
     {
         $repo = new ClientRepository();
-        return $repo->findById($id);
+        $client = $repo->findById($id);
+        if ($client) {
+            $client = self::addFullName($client);
+            $client = self::addFullAddress($client);
+        }
+        return $client;
     }
 
     /**
@@ -29,7 +127,12 @@ class Client
     public static function findByEmail($email)
     {
         $repo = new ClientRepository();
-        return $repo->findByEmail($email);
+        $client = $repo->findByEmail($email);
+        if ($client) {
+            $client = self::addFullName($client);
+            $client = self::addFullAddress($client);
+        }
+        return $client;
     }
 
     /**
@@ -38,7 +141,9 @@ class Client
     public static function withQuotes($limit = null)
     {
         $repo = new ClientRepository();
-        return $repo->findWithQuotes($limit);
+        $clients = $repo->findWithQuotes($limit);
+        $clients = self::addFullName($clients);
+        return self::addFullAddress($clients);
     }
 
     /**
@@ -47,7 +152,9 @@ class Client
     public static function search($term)
     {
         $repo = new ClientRepository();
-        return $repo->search($term);
+        $clients = $repo->search($term);
+        $clients = self::addFullName($clients);
+        return self::addFullAddress($clients);
     }
 
     /**

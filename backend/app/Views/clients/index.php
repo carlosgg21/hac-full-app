@@ -28,7 +28,7 @@ ob_start();
             <?php else: ?>
                 <?php foreach ($clients as $client): ?>
                     <tr class="border-b hover:bg-gray-50 transition">
-                        <td class="py-3 px-4 text-sm"><?= htmlspecialchars(($client['first_name'] ?? '') . ' ' . ($client['last_name'] ?? '')) ?></td>
+                        <td class="py-3 px-4 text-sm"><?= htmlspecialchars($client['full_name'] ?? '') ?></td>
                         <td class="py-3 px-4 text-sm text-gray-600"><?= htmlspecialchars($client['email'] ?? '') ?></td>
                         <td class="py-3 px-4 text-sm text-gray-600"><?= htmlspecialchars($client['phone'] ?? '') ?></td>
                         <td class="py-3 px-4">
