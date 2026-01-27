@@ -1,0 +1,26 @@
+# robots.txt for H.A.C. Renovation Inc.
+# https://www.hacrenovation.ca/
+
+User-agent: *
+Allow: /
+
+# Disallow admin area
+Disallow: /admin/
+
+# Disallow data files (JSON/JS)
+Disallow: /data/
+
+# Disallow documentation
+Disallow: /docs/
+
+# Disallow database files
+Disallow: /database/
+
+# Allow public assets
+Allow: /public/
+
+# Sitemap location
+Sitemap: https://www.hacrenovation.ca/sitemap.xml
+
+# Crawl-delay (optional, adjust if needed)
+# Crawl-delay: 1

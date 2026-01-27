@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Homepage - English -->
+  <url>
+    <loc>https://www.hacrenovation.ca/</loc>
+    <lastmod>2024-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.hacrenovation.ca/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.hacrenovation.ca/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.hacrenovation.ca/"/>
+    <image:image>
+      <image:loc>https://www.hacrenovation.ca/public/modern-home.jpg</image:loc>
+      <image:title>H.A.C. Renovation Inc. - Professional Construction Services</image:title>
+      <image:caption>Professional construction and renovation services in Montreal, Canada</image:caption>
+    </image:image>
+  </url>
+  
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://www.hacrenovation.ca/privacy-policy.html</loc>
+    <lastmod>2024-01-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.hacrenovation.ca/privacy-policy.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.hacrenovation.ca/privacy-policy.html"/>
+  </url>
+  
+</urlset>

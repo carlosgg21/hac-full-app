@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clients - Admin Dashboard</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Local Fonts -->
+  <link rel="stylesheet" href="../assets/fonts/inter/fonts.css">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="../assets/icons/bootstrap-icons/bootstrap-icons.css">
+  <style>
+    body, html { height: 100%; }
+    /* Responsive sidebar collapse */
+    @media (max-width: 1023px) {
+      .sidebar {
+        position: fixed;
+        left: -260px;
+        top: 4rem;
+        width: 16rem;
+        height: calc(100vh - 4rem);
+        z-index: 50;
+        background: #1e3a5f;
+        border-right: 1px solid #1e3a5f;
+        transition: left 0.25s;
+      }
+      .sidebar.open {
+        left: 0;
+      }
+      .main-content {
+        margin-left: 0 !important;
+        padding-top: 5.5rem;
+      }
+      .sidebar-backdrop {
+        display: block;
+      }
+    }
+    @media (min-width: 1024px) {
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 4rem;
+        bottom: 0;
+        width: 16rem;
+        z-index: 20;
+        background: #1e3a5f;
+        border-right: 1px solid #1e3a5f;
+      }
+      .sidebar-backdrop {
+        display: none;
+      }
+    }
+    .sidebar-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(31, 41, 55, 0.25);
+      z-index: 40;
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans">
+  <!-- NAVBAR TOP -->
+  <nav class="fixed top-0 left-0 w-full h-16 bg-white border-b border-gray-200 z-30 flex items-center justify-between px-6 shadow-sm">
+    <div class="flex items-center gap-3">
+      <!-- Mobile menu button -->
+      <button id="sidebarToggle" class="lg:hidden p-2 inline-flex items-center rounded hover:bg-gray-100 transition">
+        <!-- Menu Icon -->
+        <i class="bi bi-list text-2xl text-primary"></i>
+      </button>
+      <!-- Logo/Brand -->
+      <span class="inline-flex items-center gap-2 text-xl font-bold tracking-tight text-primary">
+        <img src="../public/logo.png" alt="HAC Logo" class="w-10 h-10 object-contain">
+        <span class="hidden sm:inline">H.A.C. Renovation Inc</span>
+      </span>
+    </div>
+    <div class="flex items-center gap-4">
+      <!-- User avatar + Logout -->
+      <button class="relative flex items-center gap-2 p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition">
+        <!-- Person Icon -->
+        <i class="bi bi-person-circle text-2xl text-primary"></i>
+        <span class="hidden md:inline font-medium text-primary">Admin</span>
+      </button>
+      <button class="ml-2 px-3 py-2 rounded-lg border border-primary text-primary font-semibold bg-white shadow-sm hover:bg-primary hover:text-white transition">Logout</button>
+    </div>
+  </nav>
+  <!-- SIDEBAR BACKDROP (Mobile Only) -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <!-- LAYOUT -->
+  <div class="min-h-screen flex pt-16 bg-gray-50">
+    <!-- SIDEBAR -->
+    <aside class="sidebar open lg:static lg:open" id="mainSidebar">
+      <nav class="flex flex-col h-full py-6">
+        <div class="mb-6 px-4">
+          <span class="text-sm font-semibold tracking-wider text-white/70 uppercase hidden lg:block">Menu</span>
+        </div>
+        <div class="flex-1 space-y-0.5 px-3">
+          <a href="dashboard.html" class="flex items-center px-3 py-2.5 rounded-lg text-white/80 gap-2.5 font-medium text-sm hover:bg-white/20 transition">
+            <!-- Dashboard Icon -->
+            <i class="bi bi-grid-3x3-gap text-base"></i>
+            Dashboard
+          </a>
+          <a href="clients.html" class="flex items-center px-3 py-2.5 rounded-lg bg-white/20 text-white gap-2.5 font-medium text-sm hover:bg-white/30 transition">
+            <!-- Users/Clients Icon -->
+            <i class="bi bi-people text-base"></i>
+            Clients
+          </a>
+          <a href="#" class="flex items-center px-3 py-2.5 rounded-lg text-white/80 gap-2.5 font-medium text-sm hover:bg-white/20 transition">
+            <!-- Reports Icon -->
+            <i class="bi bi-file-text text-base"></i>
+            Reports
+          </a>
+          <a href="settings.html" class="flex items-center px-3 py-2.5 rounded-lg text-white/80 gap-2.5 font-medium text-sm hover:bg-white/20 transition">
+            <!-- Settings Icon -->
+            <i class="bi bi-gear-fill text-base"></i>
+            Settings
+          </a>
+
+
+          <a href="#" class="flex items-center px-3 py-2.5 rounded-lg text-white/80 gap-2.5 font-medium text-sm hover:bg-white/20 transition">
+            <!-- Calendar Icon -->
+            <i class="bi bi-calendar3 text-base"></i>
+            Calendar
+          </a>
+
+
+          <a href="questions.html" class="flex items-center px-3 py-2.5 rounded-lg text-white/80 gap-2.5 font-medium text-sm hover:bg-white/20 transition">
+            <!-- Questions Icon -->
+            <i class="bi bi-chat-left-text text-base"></i>
+            Questions
+          </a>
+        </div>
+      </nav>
+    </aside>
+    <!-- MAIN CONTENT -->
+    <main class="main-content flex-1 flex flex-col gap-8 px-6 py-6">
+
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-2xl font-bold text-gray-800">Client List</h1>
+        <button class="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-light transition">
+          Add Client
+        </button>
+      </div>
+      <section class="bg-white rounded-xl shadow-md px-6 py-5 w-full overflow-x-auto">
+        <table class="min-w-full">
+          <thead>
+            <tr class="bg-gray-100 text-gray-700 border-b border-gray-200">
+              <th class="py-3 px-4 text-left text-sm font-semibold">Name</th>
+              <th class="py-3 px-4 text-left text-sm font-semibold">Email</th>
+              <th class="py-3 px-4 text-left text-sm font-semibold">Phone</th>
+              <th class="py-3 px-4 text-left text-sm font-semibold">Service</th>
+              <th class="py-3 px-4 text-left text-sm font-semibold">Status</th>
+              <th class="py-3 px-4 text-left text-sm font-semibold">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b hover:bg-gray-50 transition">
+              <td class="py-3 px-4 text-sm">John Doe</td>
+              <td class="py-3 px-4 text-sm text-gray-600">johndoe@mail.com</td>
+              <td class="py-3 px-4 text-sm text-gray-600">(555) 123-4567</td>
+              <td class="py-3 px-4 text-sm">Painting</td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">Completed</span>
+              </td>
+              <td class="py-3 px-4">
+                <button class="text-primary hover:text-primary-light text-sm font-medium">View</button>
+              </td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50 transition">
+              <td class="py-3 px-4 text-sm">Jane Smith</td>
+              <td class="py-3 px-4 text-sm text-gray-600">jane.smith@mail.com</td>
+              <td class="py-3 px-4 text-sm text-gray-600">(555) 234-5678</td>
+              <td class="py-3 px-4 text-sm">Demolition</td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-700">In Progress</span>
+              </td>
+              <td class="py-3 px-4">
+                <button class="text-primary hover:text-primary-light text-sm font-medium">View</button>
+              </td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50 transition">
+              <td class="py-3 px-4 text-sm">Alice Brown</td>
+              <td class="py-3 px-4 text-sm text-gray-600">alice.brown@mail.com</td>
+              <td class="py-3 px-4 text-sm text-gray-600">(555) 345-6789</td>
+              <td class="py-3 px-4 text-sm">Plumbing</td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">Pending</span>
+              </td>
+              <td class="py-3 px-4">
+                <button class="text-primary hover:text-primary-light text-sm font-medium">View</button>
+              </td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50 transition">
+              <td class="py-3 px-4 text-sm">Bob Lee</td>
+              <td class="py-3 px-4 text-sm text-gray-600">bob.lee@mail.com</td>
+              <td class="py-3 px-4 text-sm text-gray-600">(555) 456-7890</td>
+              <td class="py-3 px-4 text-sm">Remodeling</td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">Completed</span>
+              </td>
+              <td class="py-3 px-4">
+                <button class="text-primary hover:text-primary-light text-sm font-medium">View</button>
+              </td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50 transition">
+              <td class="py-3 px-4 text-sm">Sarah Johnson</td>
+              <td class="py-3 px-4 text-sm text-gray-600">sarah.j@mail.com</td>
+              <td class="py-3 px-4 text-sm text-gray-600">(555) 567-8901</td>
+              <td class="py-3 px-4 text-sm">Flooring</td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-700">In Progress</span>
+              </td>
+              <td class="py-3 px-4">
+                <button class="text-primary hover:text-primary-light text-sm font-medium">View</button>
+              </td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50 transition">
+              <td class="py-3 px-4 text-sm">Michael Chen</td>
+              <td class="py-3 px-4 text-sm text-gray-600">m.chen@mail.com</td>
+              <td class="py-3 px-4 text-sm text-gray-600">(555) 678-9012</td>
+              <td class="py-3 px-4 text-sm">Concrete Work</td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">Completed</span>
+              </td>
+              <td class="py-3 px-4">
+                <button class="text-primary hover:text-primary-light text-sm font-medium">View</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+  <script>
+    // RESPONSIVE SIDEBAR
+    const sidebar = document.getElementById('mainSidebar');
+    const sidebarBtn = document.getElementById('sidebarToggle');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    if(sidebarBtn) {
+      sidebarBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        sidebarBackdrop.style.display = sidebar.classList.contains("open") ? 'block' : 'none';
+      });
+    }
+    if(sidebarBackdrop){
+      sidebarBackdrop.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        sidebarBackdrop.style.display = 'none';
+      });
+    }
+  </script>
+</body>
+</html>
