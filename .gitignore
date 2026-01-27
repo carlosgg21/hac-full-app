@@ -50,3 +50,6 @@ generate_*.php
 
 # Archivos de Laragon específicos
 .laragon/
+
+# Carpeta de referencia (mockups/plantillas HTML)
+referencia/
