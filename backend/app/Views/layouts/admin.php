@@ -44,21 +44,46 @@
     <style>
         body, html { height: 100%; }
         
-        /* Responsive sidebar collapse */
-        @media (max-width: 1023px) {
+        /* Estilos base del sidebar */
+        .sidebar {
+            background: #1e3a5f;
+            border-right: 1px solid #1e3a5f;
+        }
+        
+        /* Desktop: > 1024px - Sidebar siempre visible */
+        @media (min-width: 1025px) {
+            .sidebar {
+                position: static;
+                width: 16rem;
+                z-index: 20;
+                transform: translateX(0) !important;
+            }
+            .sidebar-backdrop {
+                display: none !important;
+            }
+            .sidebar-toggle {
+                display: none !important;
+            }
+        }
+        
+        /* Tablet: 768px - 1024px - Sidebar oculto, hamburguesa visible */
+        @media (min-width: 768px) and (max-width: 1024px) {
             .sidebar {
                 position: fixed;
-                left: -260px;
+                left: 0;
                 top: 4rem;
                 width: 16rem;
                 height: calc(100vh - 4rem);
                 z-index: 50;
                 background: #1e3a5f;
                 border-right: 1px solid #1e3a5f;
-                transition: left 0.25s;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+                will-change: transform;
             }
             .sidebar.open {
-                left: 0;
+                transform: translateX(0);
             }
             .main-content {
                 margin-left: 0 !important;
@@ -67,40 +92,96 @@
             .sidebar-backdrop {
                 display: block;
             }
+            .sidebar-toggle {
+                display: block;
+            }
         }
         
-        @media (min-width: 1024px) {
+        /* Móvil: < 768px - Sidebar oculto, hamburguesa visible */
+        @media (max-width: 767px) {
             .sidebar {
-                position: static;
+                position: fixed;
+                left: 0;
+                top: 4rem;
                 width: 16rem;
-                z-index: 20;
+                height: calc(100vh - 4rem);
+                z-index: 50;
                 background: #1e3a5f;
                 border-right: 1px solid #1e3a5f;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+                will-change: transform;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0 !important;
+                width: 100%;
             }
             .sidebar-backdrop {
-                display: none;
+                display: block;
+            }
+            .sidebar-toggle {
+                display: block;
             }
         }
         
+        /* Overlay/Backdrop mejorado con animación */
         .sidebar-backdrop {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(31, 41, 55, 0.25);
+            background: rgba(31, 41, 55, 0.5);
             z-index: 40;
             display: none;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+        
+        .sidebar-backdrop.show {
+            display: block;
+            opacity: 1;
         }
         
         .main-content {
             padding: 1.5rem;
+            transition: margin-left 0.3s ease-in-out;
         }
         
-        @media (max-width: 1023px) {
-            .main-content {
-                padding: 1.5rem;
-            }
+        /* Animación del botón hamburguesa */
+        .hamburger-icon {
+            width: 24px;
+            height: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        
+        .hamburger-line {
+            width: 24px;
+            height: 2px;
+            background-color: #1e3a5f;
+            border-radius: 2px;
+            transition: all 0.3s ease-in-out;
+            transform-origin: center;
+        }
+        
+        .hamburger-icon.open .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+        
+        .hamburger-icon.open .hamburger-line:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+        
+        .hamburger-icon.open .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
         }
     </style>
 </head>
@@ -136,27 +217,109 @@
         </main>
     </div>
     
-    <!-- JavaScript para sidebar toggle -->
+    <!-- JavaScript para sidebar toggle mejorado -->
     <script>
-        // RESPONSIVE SIDEBAR
+        // RESPONSIVE SIDEBAR con mejoras
         const sidebar = document.getElementById('mainSidebar');
         const sidebarBtn = document.getElementById('sidebarToggle');
         const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+        const hamburgerIcon = document.getElementById('hamburgerIcon');
         
-        if(sidebarBtn) {
-            sidebarBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('open');
+        // Función para abrir sidebar
+        function openSidebar() {
+            if (sidebar) {
+                sidebar.classList.add('open');
+                if (hamburgerIcon) {
+                    hamburgerIcon.classList.add('open');
+                }
+                if (sidebarBtn) {
+                    sidebarBtn.setAttribute('aria-expanded', 'true');
+                }
                 if (sidebarBackdrop) {
-                    sidebarBackdrop.style.display = sidebar.classList.contains("open") ? 'block' : 'none';
+                    sidebarBackdrop.classList.add('show');
+                }
+                // Prevenir scroll del body cuando sidebar está abierto
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        // Función para cerrar sidebar
+        function closeSidebar() {
+            if (sidebar) {
+                sidebar.classList.remove('open');
+                if (hamburgerIcon) {
+                    hamburgerIcon.classList.remove('open');
+                }
+                if (sidebarBtn) {
+                    sidebarBtn.setAttribute('aria-expanded', 'false');
+                }
+                if (sidebarBackdrop) {
+                    sidebarBackdrop.classList.remove('show');
+                    // Esperar a que termine la animación antes de ocultar
+                    setTimeout(() => {
+                        if (!sidebar.classList.contains('open')) {
+                            sidebarBackdrop.style.display = 'none';
+                        }
+                    }, 200);
+                }
+                // Restaurar scroll del body
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Toggle sidebar
+        if(sidebarBtn) {
+            sidebarBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (sidebar && sidebar.classList.contains('open')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
                 }
             });
         }
         
-        if(sidebarBackdrop){
+        // Cerrar al hacer clic en backdrop
+        if(sidebarBackdrop) {
             sidebarBackdrop.addEventListener('click', () => {
-                sidebar.classList.remove('open');
-                sidebarBackdrop.style.display = 'none';
+                closeSidebar();
             });
+        }
+        
+        // Cerrar al hacer clic en enlaces del sidebar (solo en móvil/tablet)
+        if (sidebar) {
+            const sidebarLinks = sidebar.querySelectorAll('a');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    // Solo cerrar en pantallas pequeñas (donde el sidebar está oculto por defecto)
+                    if (window.innerWidth <= 1024) {
+                        closeSidebar();
+                    }
+                });
+            });
+        }
+        
+        // Cerrar con tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebar && sidebar.classList.contains('open')) {
+                closeSidebar();
+            }
+        });
+        
+        // Cerrar al redimensionar ventana (si se pasa a desktop)
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (window.innerWidth > 1024 && sidebar && sidebar.classList.contains('open')) {
+                    closeSidebar();
+                }
+            }, 250);
+        });
+        
+        // Inicializar estado del backdrop
+        if (sidebarBackdrop) {
+            sidebarBackdrop.style.display = 'none';
         }
     </script>
 </body>

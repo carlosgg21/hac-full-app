@@ -42,7 +42,7 @@ function isActive($page) {
 }
 ?>
 <!-- SIDEBAR -->
-<aside class="sidebar open lg:static lg:open" id="mainSidebar">
+<aside class="sidebar" id="mainSidebar">
   <nav class="flex flex-col h-full py-6">
     <div class="mb-6 px-4">
       <span class="text-sm font-semibold tracking-wider text-white/70 uppercase hidden lg:block">Menu</span>

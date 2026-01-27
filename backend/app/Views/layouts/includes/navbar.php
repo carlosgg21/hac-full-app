@@ -10,10 +10,19 @@ $logoPath = $basePath . '/public/logo.png';
 <!-- NAVBAR TOP -->
 <nav class="fixed top-0 left-0 w-full h-16 bg-white border-b border-gray-200 z-30 flex items-center justify-between px-6 shadow-sm">
   <div class="flex items-center gap-3">
-    <!-- Mobile menu button -->
-    <button id="sidebarToggle" class="lg:hidden p-2 inline-flex items-center rounded hover:bg-gray-100 transition">
-      <!-- Menu Icon -->
-      <i class="bi bi-list text-2xl" style="color: #1e3a5f;"></i>
+    <!-- Mobile/Tablet menu button con animación -->
+    <button 
+      id="sidebarToggle" 
+      class="sidebar-toggle p-2 inline-flex flex-col items-center justify-center rounded hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" 
+      aria-label="Toggle menu"
+      aria-expanded="false"
+    >
+      <!-- Hamburger Icon animado -->
+      <div class="hamburger-icon" id="hamburgerIcon">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+      </div>
     </button>
     <!-- Logo/Brand -->
     <span class="inline-flex items-center gap-2 text-xl font-bold tracking-tight" style="color: #1e3a5f;">
