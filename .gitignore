@@ -1,0 +1,52 @@
+# Archivos de entorno (crear .env.example como plantilla)
+.env
+.env.local
+.env.*.local
+.env.example
+
+# Logs
+*.log
+logs/
+backend/logs/
+
+# Archivos temporales y de sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Archivos de uploads (si contienen datos sensibles)
+backend/public/uploads/*
+!backend/public/uploads/.gitkeep
+
+# Archivos de sesión
+backend/sessions/*
+!backend/sessions/.gitkeep
+
+# Archivos de cache
+cache/
+tmp/
+temp/
+
+# Dependencias de Composer (si las hay)
+vendor/
+composer.lock
+
+# Archivos de backup
+*.bak
+*.backup
+*_backup.php
+
+# Archivos de prueba/debug
+test_*.php
+debug_*.php
+fix_*.php
+generate_*.php
+
+# Archivos de Laragon específicos
+.laragon/
