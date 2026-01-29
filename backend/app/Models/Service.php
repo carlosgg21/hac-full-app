@@ -16,11 +16,13 @@ class Service
 
     /**
      * Obtener servicios activos
+     * @param array|null $fields Columnas a devolver (ej: ['id', 'name']). null = todas
+     * @param string|null $orderBy Orden (ej: 'name ASC', 'created_at DESC'). null = name ASC
      */
-    public static function active()
+    public static function active(array $fields = null, $orderBy = null)
     {
         $repo = new ServiceRepository();
-        return $repo->findActive();
+        return $repo->findActive($fields, $orderBy);
     }
 
     /**

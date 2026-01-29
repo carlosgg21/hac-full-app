@@ -21,6 +21,17 @@ define('PUBLIC_PATH', BASE_PATH . '/public');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Detectar si es petición API antes de cargar config (para no enviar HTML en respuestas API)
+$routeFromGet = $_GET['route'] ?? '';
+$uriForRoute = $_SERVER['REQUEST_URI'] ?? '';
+if ($routeFromGet !== '' || $uriForRoute !== '') {
+    $earlyRoute = $routeFromGet !== '' ? $routeFromGet : preg_replace('#^/hac-tests/backend/?#', '', strtok($uriForRoute, '?'));
+    $earlyRoute = $earlyRoute !== '' ? trim(preg_replace('#^/backend/?#', '', $earlyRoute), '/') : '';
+    if (strpos($earlyRoute, 'api/') === 0 || strpos($uriForRoute, '/api/') !== false) {
+        ini_set('display_errors', '0');
+    }
+}
+
 // Autoloader function
 spl_autoload_register(function ($class) {
     // Convert namespace to path

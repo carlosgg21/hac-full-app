@@ -58,11 +58,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Obtener ruta de API (usar BASE_PATH_URL para soportar /backend y /hac-tests/backend)
+// Obtener ruta de API: todo lo que va después de "/api/" en la URL (funciona con cualquier base)
 $requestUri = strtok($_SERVER['REQUEST_URI'] ?? '', '?');
-$apiPrefix = (defined('BASE_PATH_URL') ? BASE_PATH_URL : '/backend') . '/api';
-$apiPath = preg_replace('#^' . preg_quote($apiPrefix, '#') . '/?#', '', $requestUri);
-$apiPath = trim($apiPath, '/');
+$apiPath = '';
+if (preg_match('#/api/(.*)$#', $requestUri, $m)) {
+    $apiPath = trim($m[1], '/');
+}
 
 // Parsear ruta: resource (ej. clients), id (opcional)
 $parts = explode('/', $apiPath);

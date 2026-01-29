@@ -6,7 +6,7 @@ ob_start();
 ?>
 
 <?php $basePath = defined('BASE_PATH_URL') ? BASE_PATH_URL : '/backend'; ?>
-<div id="clientListWrap" class="client-list-page" data-api-url="<?= htmlspecialchars(Response::url('/api/clients')) ?>" data-base-url="<?= htmlspecialchars(rtrim(Response::url(''), '/')) ?>">
+<div id="clientListWrap" class="client-list-page">
 <div class="mb-6">
     <div class="flex items-center justify-between flex-wrap gap-4">
         <div class="flex items-center gap-3">
@@ -25,10 +25,10 @@ ob_start();
     </div>
 </div>
 
-<form method="get" action="<?= Response::url('/clients') ?>" class="mb-6" id="clientSearchForm">
+<form method="get" action="#" class="mb-6" id="clientSearchForm">
     <div class="relative max-w-xl">
         <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
-        <input type="search" id="clientSearchInput" name="search" value="<?= htmlspecialchars($searchValue) ?>" placeholder="Search by name or email..." class="w-full pl-10 pr-4 py-2.5 bg-gray-100 border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" autocomplete="off">
+        <input type="search" id="clientSearchInput" name="search" value="<?= htmlspecialchars($searchValue) ?>" placeholder="Search by name..." class="w-full pl-10 pr-4 py-2.5 bg-gray-100 border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" autocomplete="off">
     </div>
 </form>
 
@@ -76,12 +76,16 @@ ob_start();
                     <?php
                     $fn = $client['first_name'] ?? '';
                     $ln = $client['last_name'] ?? '';
-                    $initials = trim($fn) !== '' && trim($ln) !== ''
-                        ? strtoupper(substr($fn, 0, 1) . substr($ln, 0, 1))
-                        : strtoupper(substr($client['full_name'] ?? '', 0, 2));
+                    $enc = 'UTF-8';
+                    if (trim($fn) !== '' && trim($ln) !== '') {
+                        $initials = mb_strtoupper(mb_substr($fn, 0, 1, $enc) . mb_substr($ln, 0, 1, $enc), $enc);
+                    } else {
+                        $full = $client['full_name'] ?? '';
+                        $initials = mb_strtoupper(mb_substr($full, 0, 2, $enc), $enc);
+                    }
                     $hasNotes = !empty(trim($client['notes'] ?? ''));
                     ?>
-                    <tr class="border-b border-gray-100 hover:bg-gray-50/80 transition">
+                    <tr class="border-b border-gray-100 hover:bg-gray-50/80 transition" data-client-name="<?= htmlspecialchars($client['full_name'] ?? '') ?>">
                         <td class="py-3 px-4">
                             <div class="flex items-center gap-3">
                                 <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-sm font-medium">
@@ -134,6 +138,12 @@ ob_start();
                         </td>
                     </tr>
                 <?php endforeach; ?>
+                <tr id="clientListEmptyRow" style="display:none;">
+                    <td colspan="5" class="py-12 text-center text-gray-500">
+                        <i class="bi bi-inbox text-4xl block mb-2 text-gray-300"></i>
+                        No contacts found
+                    </td>
+                </tr>
             <?php endif; ?>
         </tbody>
     </table>
