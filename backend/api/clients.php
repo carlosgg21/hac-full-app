@@ -8,10 +8,13 @@ Auth::requireAuth();
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
-// Obtener ID de la ruta
-$requestUri = $_SERVER['REQUEST_URI'] ?? '';
-$parts = explode('/', trim(str_replace('/backend/api/clients', '', $requestUri), '/'));
-$id = $parts[0] ?? null;
+// Obtener ID de la ruta (usar BASE_PATH_URL para soportar /backend y /hac-tests/backend)
+$requestUri = strtok($_SERVER['REQUEST_URI'] ?? '', '?');
+$clientsPrefix = (defined('BASE_PATH_URL') ? BASE_PATH_URL : '/backend') . '/api/clients';
+$pathAfter = preg_replace('#^' . preg_quote($clientsPrefix, '#') . '/?#', '', $requestUri);
+$pathAfter = trim($pathAfter, '/');
+$pathParts = explode('/', $pathAfter);
+$id = (isset($pathParts[0]) && $pathParts[0] !== '') ? $pathParts[0] : null;
 
 $controller = new ClientController();
 

@@ -38,7 +38,11 @@ class ClientController
      */
     public function create()
     {
-        Response::view('clients/create');
+        $post = $_SESSION['client_form'] ?? $_POST ?? [];
+        if (isset($_SESSION['client_form'])) {
+            unset($_SESSION['client_form']);
+        }
+        Response::view('clients/create', ['post' => $post]);
     }
 
     /**
@@ -65,6 +69,7 @@ class ClientController
                 Response::error('Nombre, apellido y email son requeridos');
             } else {
                 $_SESSION['error'] = 'Nombre, apellido y email son requeridos';
+                $_SESSION['client_form'] = $data;
                 Response::redirect('/clients/create');
             }
         }

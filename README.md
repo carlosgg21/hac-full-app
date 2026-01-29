@@ -1,257 +1,211 @@
-# H.A.C. Renovation - Sistema de Gestión
+# H.A.C. Renovation
 
-Sistema completo de gestión para empresa de construcción y renovación, incluyendo gestión de clientes, cotizaciones, proyectos y reportes.
+**Sistema de Gestión** para empresa de construcción y renovación. Gestión de clientes, cotizaciones, proyectos y reportes.
+
+[![Versión](https://img.shields.io/badge/versión-1.0.0-blue.svg)](install.html)
+[![PHP](https://img.shields.io/badge/PHP-7.4+-777BB4?logo=php&logoColor=white)](https://php.net)
+[![MySQL](https://img.shields.io/badge/MySQL-5.7+-4479A1?logo=mysql&logoColor=white)](https://mysql.com)
+
+---
 
 ## 📋 Descripción
 
-H.A.C. Renovation es una aplicación web desarrollada en PHP que permite gestionar:
-- **Clientes**: Base de datos de clientes con información de contacto
-- **Cotizaciones**: Generación y seguimiento de cotizaciones
-- **Proyectos**: Gestión de proyectos derivados de cotizaciones aceptadas
-- **Reportes**: Estadísticas y reportes de cotizaciones y proyectos
-- **Preguntas**: Sistema de cuestionarios para evaluación de servicios
-- **Empresa**: Información y configuración de la compañía
+H.A.C. Renovation es una aplicación web en PHP que permite gestionar:
 
-## 🚀 Requisitos del Sistema
+| Módulo | Descripción |
+|--------|-------------|
+| **Clientes** | Base de datos de clientes con información de contacto |
+| **Cotizaciones** | Generación y seguimiento de cotizaciones |
+| **Proyectos** | Gestión de proyectos derivados de cotizaciones aceptadas |
+| **Reportes** | Estadísticas y reportes de cotizaciones y proyectos |
+| **Preguntas** | Sistema de cuestionarios para evaluación de servicios |
+| **Empresa** | Información y configuración de la compañía |
 
-### Requisitos Mínimos
-- **PHP**: 7.4 o superior
-- **MySQL**: 5.7+ o MariaDB 10.2+
-- **Apache**: Con mod_rewrite habilitado
-- **Extensiones PHP**:
-  - PDO
-  - PDO_MySQL
-  - JSON
-  - Session
-  - mbstring
+> 📖 **Guía visual**: Para una guía de instalación paso a paso con interfaz gráfica, abre [install.html](install.html) en tu navegador.
 
-### Entornos Recomendados
-- **Laragon** (Windows) - Recomendado para desarrollo
-- **XAMPP** (Windows/Mac/Linux)
-- **WAMP** (Windows)
-- **MAMP** (Mac)
+---
 
-## 📦 Instalación
+## ✅ Requisitos del Sistema
 
-### Paso 1: Clonar o Descargar el Repositorio
+### Servidor Web
+- **Apache** con `mod_rewrite`
+- **PHP** 7.4 o superior
+- **Extensiones**: PDO, PDO_MySQL, JSON
+
+### Base de Datos
+- **MySQL** 5.7+ o **MariaDB** 10.2+
+- phpMyAdmin (recomendado para gestión)
+
+### Entornos recomendados
+- **Laragon** (Windows) – recomendado para desarrollo
+- **XAMPP** / **WAMP** / **MAMP**
+
+---
+
+## 🚀 Instalación
+
+Sigue estos pasos en orden. La instalación no debería tomar más de **15 minutos**.
+
+### Paso 1: Descargar o clonar el proyecto
+
+**Opción A: Con Git (recomendado)**
 
 ```bash
-# Si tienes Git instalado
 git clone <url-del-repositorio> hac-renovation
 cd hac-renovation
-
-# O descarga el ZIP y extrae los archivos
 ```
 
-### Paso 2: Configurar el Servidor Web
+**Opción B: Descargar ZIP**
+1. Descarga el archivo ZIP del repositorio
+2. Extrae los archivos en una carpeta
+3. Opcional: nombra la carpeta `hac-renovation`
 
-#### Opción A: Laragon (Recomendado para Windows)
+---
 
+### Paso 2: Configurar el servidor web
+
+Coloca el proyecto en el directorio de tu servidor web.
+
+**Laragon (Windows)**
 1. Abre Laragon
-2. Coloca la carpeta del proyecto en `C:\laragon\www\` (o tu directorio configurado)
-3. Inicia Laragon (Apache y MySQL)
-4. Accede a: `http://localhost/hac-renovation/` o `http://hac-renovation.test/`
+2. Copia la carpeta del proyecto a `C:\laragon\www\`
+3. Inicia Laragon (botón "Start All")
+4. Accede a: `http://localhost/hac-renovation/`
 
-#### Opción B: XAMPP/WAMP/MAMP
-
-1. Coloca la carpeta del proyecto en el directorio `htdocs` (XAMPP) o `www` (WAMP/MAMP)
+**XAMPP / WAMP / MAMP**
+1. Copia la carpeta a `htdocs` (XAMPP) o `www` (WAMP/MAMP)
 2. Inicia Apache y MySQL desde el panel de control
 3. Accede a: `http://localhost/hac-renovation/`
 
-### Paso 3: Crear la Base de Datos
+---
 
-1. Abre phpMyAdmin o tu cliente MySQL preferido
-2. Crea una nueva base de datos llamada `hac_renovation`
-3. Importa el archivo `backend/database/schema.sql`:
-   - En phpMyAdmin: Selecciona la base de datos → Pestaña "Importar" → Selecciona `schema.sql` → Ejecutar
+### Paso 3: Crear la base de datos
 
-O ejecuta desde la línea de comandos:
+1. Asegúrate de que **MySQL esté corriendo**.
+2. Abre **phpMyAdmin** y crea una nueva base de datos:
+   - **Nombre:** `hac_renovation`
+   - **Intercalación:** `utf8mb4_unicode_ci`
+3. Importa el schema:
+   - Selecciona la base de datos `hac_renovation`
+   - Pestaña **Importar** → Selecciona `backend/database/schema.sql` → **Ejecutar**
+
+Desde línea de comandos:
 
 ```bash
 mysql -u root -p < backend/database/schema.sql
 ```
 
-### Paso 4: Configurar los Archivos
+---
 
-#### 4.1. Configurar Base de Datos
+### Paso 4: Configurar los archivos
 
-Edita el archivo `backend/config/database.php`:
+Edita `backend/config/database.php` con tus datos:
 
 ```php
-return [
-    'driver' => 'mysql',
-    'host' => 'localhost',
-    'port' => 3306,
-    'database' => 'hac_renovation',
-    'username' => 'root',        // Cambia según tu configuración
-    'password' => 'root',        // Cambia según tu configuración
-    'charset' => 'utf8mb4',
-    'collation' => 'utf8mb4_unicode_ci',
-    // ...
-];
+'host'     => 'localhost',
+'database' => 'hac_renovation',
+'username' => 'root',      // Cambia si es necesario
+'password' => 'root',      // Cambia si es necesario
 ```
 
-#### 4.2. Configurar Aplicación (Opcional)
+> ⚠️ Sin esta configuración, el sistema no podrá conectarse a la base de datos.
 
-Edita `backend/config/config.php` si necesitas cambiar:
-- `APP_ENV`: 'development' o 'production'
-- Zona horaria: Por defecto 'America/Mexico_City'
-- URLs base: Se detectan automáticamente
+El archivo `backend/config/config.php` generalmente no necesita cambios (zona horaria, entorno development/production).
 
-### Paso 5: Importar Datos de Prueba (Opcional)
+---
 
-Para tener datos de ejemplo en el sistema:
+### Paso 5: Importar datos de prueba (opcional)
+
+Si quieres datos de ejemplo:
+
+- En phpMyAdmin: selecciona `hac_renovation` → **Importar** → `backend/database/fake_data.sql` → **Ejecutar**
+
+O desde línea de comandos:
 
 ```bash
 mysql -u root -p hac_renovation < backend/database/fake_data.sql
 ```
 
-O desde phpMyAdmin:
-- Selecciona la base de datos `hac_renovation`
-- Pestaña "Importar" → Selecciona `fake_data.sql` → Ejecutar
+---
 
-### Paso 6: Verificar la Instalación
+### Paso 6: Verificar la instalación
 
-1. Accede al backend: `http://localhost/hac-renovation/backend/`
-2. Deberías ver la página de estado o el login
-3. Credenciales por defecto:
-   - **Usuario**: `admin`
-   - **Contraseña**: `admin123`
+1. Abre el navegador y ve a: `http://localhost/hac-renovation/backend/`
+2. Deberías ver la página de login o el dashboard
+3. Inicia sesión con las credenciales por defecto:
+   - **Usuario:** `admin`
+   - **Contraseña:** `admin123`
 
-> ⚠️ **IMPORTANTE**: Cambia la contraseña del administrador en producción.
+> 🔒 **IMPORTANTE:** Cambia la contraseña del administrador después de la primera sesión, sobre todo en producción.
 
-## 📁 Estructura del Proyecto
+---
+
+## 📁 Estructura del proyecto
 
 ```
 hac-renovation/
-├── backend/                 # Backend PHP
-│   ├── api/                # Endpoints API REST
+├── backend/                    # Backend PHP
+│   ├── api/                    # Endpoints API REST
 │   ├── app/
-│   │   ├── Controllers/    # Controladores MVC
-│   │   ├── Models/        # Modelos de datos
-│   │   ├── Repositories/  # Capa de acceso a datos
-│   │   ├── Views/         # Vistas PHP
-│   │   └── Helpers/       # Funciones auxiliares
-│   ├── config/            # Archivos de configuración
-│   ├── core/              # Clases core (Router, Database, Auth)
-│   ├── database/          # Scripts SQL
-│   │   ├── schema.sql     # Estructura de base de datos
-│   │   └── fake_data.sql  # Datos de prueba
-│   ├── public/            # Archivos públicos (assets)
-│   ├── index.php          # Punto de entrada
-│   └── .htaccess          # Configuración Apache
-├── css/                   # Estilos frontend
-├── js/                    # JavaScript frontend
-├── public/                # Imágenes y recursos públicos
-├── index.html             # Página principal frontend
-└── README.md             # Este archivo
+│   │   ├── Controllers/        # Controladores MVC
+│   │   ├── Models/             # Modelos
+│   │   ├── Repositories/      # Acceso a datos
+│   │   ├── Views/              # Vistas PHP
+│   │   └── Helpers/            # Funciones auxiliares
+│   ├── config/                 # Configuración
+│   ├── core/                   # Router, Database, Auth
+│   ├── database/
+│   │   ├── schema.sql          # Estructura BD
+│   │   └── fake_data.sql       # Datos de prueba
+│   ├── public/                 # Assets (CSS, JS, imágenes)
+│   ├── index.php               # Punto de entrada
+│   └── .htaccess
+├── css/                        # Estilos frontend
+├── js/                         # JavaScript frontend
+├── public/                     # Imágenes y recursos públicos
+├── index.html                  # Página principal
+├── install.html                # Guía de instalación (visual)
+└── README.md
 ```
 
-## ⚙️ Configuración
+---
 
-### Variables de Configuración Importantes
+## 🐛 Solución de problemas
 
-**backend/config/database.php**
-- `host`: Servidor de base de datos (default: localhost)
-- `database`: Nombre de la base de datos
-- `username`: Usuario de MySQL
-- `password`: Contraseña de MySQL
+| Problema | Solución |
+|----------|----------|
+| **No se puede conectar a la base de datos** | Verifica que MySQL esté corriendo, revisa credenciales en `backend/config/database.php` y que exista la BD `hac_renovation`. |
+| **404 Not Found o rutas no funcionan** | Comprueba que `mod_rewrite` esté habilitado en Apache y que exista `backend/.htaccess`. Reinicia Apache en Laragon. |
+| **La página muestra código PHP** | Verifica que PHP esté instalado y que Apache esté configurado para ejecutar PHP. Reinicia Apache. |
+| **Caracteres especiales (acentos, ñ)** | Usa intercalación `utf8mb4` en la BD, guarda archivos PHP en UTF-8 y revisa charset en `database.php`. |
 
-**backend/config/config.php**
-- `APP_ENV`: Entorno ('development' o 'production')
-- `BASE_URL`: URL base (se detecta automáticamente)
-- `SESSION_LIFETIME`: Duración de sesión en segundos
+---
 
-### Permisos de Directorios
+## 🛠️ Tecnologías
 
-Asegúrate de que estos directorios tengan permisos de escritura:
-- `backend/public/uploads/` (para archivos subidos)
-- `backend/logs/` (si existe, para logs de errores)
-
-## 🔐 Credenciales por Defecto
-
-Después de importar `schema.sql`, el usuario administrador es:
-
-- **Username**: `admin`
-- **Password**: `admin123`
-- **Email**: `admin@hacrenovation.com`
-
-> ⚠️ **Cambia estas credenciales inmediatamente en producción.**
-
-## 🐛 Solución de Problemas
-
-### Error: "No se puede conectar a la base de datos"
-- Verifica que MySQL esté corriendo
-- Revisa las credenciales en `backend/config/database.php`
-- Asegúrate de que la base de datos `hac_renovation` existe
-
-### Error: "404 Not Found" o rutas no funcionan
-- Verifica que `mod_rewrite` esté habilitado en Apache
-- Revisa el archivo `.htaccess` en `backend/`
-- En Laragon, verifica que Apache esté corriendo
-
-### Error: "Class not found"
-- Verifica que el autoloader esté funcionando
-- Asegúrate de que todas las clases estén en sus directorios correctos
-- Revisa los permisos de archivos
-
-### La página muestra código PHP en lugar de ejecutarlo
-- Verifica que PHP esté instalado y corriendo
-- Revisa la configuración de Apache para archivos PHP
-- En Laragon, reinicia Apache
-
-### Problemas con caracteres especiales (acentos, ñ)
-- Asegúrate de que la base de datos use `utf8mb4`
-- Verifica que los archivos PHP estén guardados en UTF-8
-- Revisa la configuración de charset en `database.php`
-
-## 🛠️ Tecnologías Utilizadas
-
-- **Backend**: PHP 7.4+ (Vanilla PHP, sin frameworks)
-- **Base de Datos**: MySQL 5.7+ / MariaDB 10.2+
-- **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
-- **Estilos**: Tailwind CSS (CDN)
-- **Iconos**: Bootstrap Icons
-- **Servidor**: Apache con mod_rewrite
-- **Arquitectura**: MVC + Repository Pattern
-
-## 📝 Desarrollo
-
-### Estructura MVC
-
-- **Models**: Lógica de negocio y acceso a datos
-- **Repositories**: Acceso directo a la base de datos
-- **Controllers**: Manejo de peticiones HTTP
-- **Views**: Presentación de datos
-
-### Helpers Disponibles
-
-- `Helper`: Funciones de formateo de fechas
-- `JsonHelper`: Funciones para trabajar con JSON (campos MySQL JSON)
+- **Backend:** PHP 7.4+ (vanilla, sin frameworks)
+- **Base de datos:** MySQL 5.7+ / MariaDB 10.2+
+- **Frontend:** HTML5, CSS3, JavaScript, Tailwind CSS, Bootstrap Icons
+- **Arquitectura:** MVC + Repository Pattern
 
 ### API REST
 
-Los endpoints API están en `backend/api/`:
-- `/api/auth.php` - Autenticación
-- `/api/clients.php` - Gestión de clientes
-- `/api/quotes.php` - Gestión de cotizaciones
-- `/api/projects.php` - Gestión de proyectos
-- `/api/company.php` - Información de la empresa
-- `/api/reports.php` - Reportes
+Endpoints en `backend/api/`:
+
+- `auth.php` – Autenticación
+- `clients.php` – Clientes
+- `quotes.php` – Cotizaciones
+- `projects.php` – Proyectos
+- `company.php` – Información de empresa
+- `reports.php` – Reportes
+
+---
 
 ## 📄 Licencia
 
 [Especificar licencia si aplica]
 
-## 👥 Contribución
-
-[Instrucciones de contribución si aplica]
-
-## 📧 Contacto
-
-Para soporte o preguntas sobre la instalación, contacta al equipo de desarrollo.
-
 ---
 
-**Versión**: 1.0.0  
-**Última actualización**: Enero 2025
+**H.A.C. Renovation** – Sistema de Gestión v1.0.0  
+Para más información, consulta [install.html](install.html).

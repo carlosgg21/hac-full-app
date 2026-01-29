@@ -3,6 +3,9 @@
  * H.A.C. Renovation - API Router
  */
 
+// Evitar que avisos/errores PHP se envíen como HTML y rompan la respuesta JSON
+ini_set('display_errors', '0');
+
 // Definir constantes si no están definidas
 if (!defined('BASE_PATH')) {
     define('BASE_PATH', dirname(__DIR__));
@@ -55,15 +58,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Obtener ruta de API
-$requestUri = $_SERVER['REQUEST_URI'] ?? '';
-$apiPath = str_replace('/backend/api', '', $requestUri);
+// Obtener ruta de API (usar BASE_PATH_URL para soportar /backend y /hac-tests/backend)
+$requestUri = strtok($_SERVER['REQUEST_URI'] ?? '', '?');
+$apiPrefix = (defined('BASE_PATH_URL') ? BASE_PATH_URL : '/backend') . '/api';
+$apiPath = preg_replace('#^' . preg_quote($apiPrefix, '#') . '/?#', '', $requestUri);
 $apiPath = trim($apiPath, '/');
 
-// Parsear ruta
+// Parsear ruta: resource (ej. clients), id (opcional)
 $parts = explode('/', $apiPath);
 $resource = $parts[0] ?? '';
-$id = $parts[1] ?? null;
+$id = (isset($parts[1]) && $parts[1] !== '') ? $parts[1] : null;
 
 // Determinar método HTTP
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
