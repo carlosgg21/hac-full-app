@@ -27,7 +27,7 @@ class ProjectController
         }
 
         if (self::isApiRequest()) {
-            Response::success('Proyectos obtenidos', $projects);
+            Response::success('Projects retrieved', $projects);
         } else {
             Response::view('projects/index', ['projects' => $projects, 'status' => $status]);
         }
@@ -41,11 +41,11 @@ class ProjectController
         $project = Project::find($id);
         
         if (!$project) {
-            Response::notFound('Proyecto no encontrado');
+            Response::notFound('Project not found');
         }
 
         if (self::isApiRequest()) {
-            Response::success('Proyecto obtenido', $project);
+            Response::success('Project retrieved', $project);
         } else {
             Response::view('projects/show', ['project' => $project]);
         }
@@ -60,9 +60,9 @@ class ProjectController
         
         if (empty($quoteId)) {
             if (self::isApiRequest()) {
-                Response::error('ID de cotización es requerido');
+                Response::error('Quote ID is required');
             } else {
-                $_SESSION['error'] = 'ID de cotización es requerido';
+                $_SESSION['error'] = 'Quote ID is required';
                 Response::redirect('/quotes');
             }
         }
@@ -80,9 +80,9 @@ class ProjectController
             $id = Project::createFromQuote($quoteId, $data);
 
             if (self::isApiRequest()) {
-                Response::success('Proyecto creado', ['id' => $id], 201);
+                Response::success('Project created', ['id' => $id], 201);
             } else {
-                $_SESSION['success'] = 'Proyecto creado exitosamente';
+                $_SESSION['success'] = 'Project created successfully';
                 Response::redirect('/projects/' . $id);
             }
         } catch (Exception $e) {
@@ -103,7 +103,7 @@ class ProjectController
         $project = Project::find($id);
         
         if (!$project) {
-            Response::notFound('Proyecto no encontrado');
+            Response::notFound('Project not found');
         }
 
         $data = [
@@ -122,9 +122,9 @@ class ProjectController
         Project::update($id, $data);
 
         if (self::isApiRequest()) {
-            Response::success('Proyecto actualizado');
+            Response::success('Project updated');
         } else {
-            $_SESSION['success'] = 'Proyecto actualizado exitosamente';
+            $_SESSION['success'] = 'Project updated successfully';
             Response::redirect('/projects/' . $id);
         }
     }

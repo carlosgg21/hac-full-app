@@ -7,7 +7,7 @@
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 if ($method !== 'GET') {
-    Response::error('Método no permitido', null, 405);
+    Response::error('Method not allowed', null, 405);
 }
 
 $serviceId = isset($_GET['service_id']) ? (int) $_GET['service_id'] : null;
@@ -18,4 +18,4 @@ if ($serviceId > 0) {
     $questions = Question::active();
 }
 
-Response::success('Preguntas obtenidas', $questions);
+Response::success('Questions retrieved', $questions);

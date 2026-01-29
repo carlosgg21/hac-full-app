@@ -35,10 +35,10 @@ switch ($method) {
         if ($id) {
             $controller->update($id);
         } else {
-            Response::error('ID requerido', null, 400);
+            Response::error('ID required', null, 400);
         }
         break;
 
     default:
-        Response::error('Método no permitido', null, 405);
+        Response::error('Method not allowed', null, 405);
 }

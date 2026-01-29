@@ -79,5 +79,5 @@ $endpointFile = BASE_PATH . '/api/' . $resource . '.php';
 if (file_exists($endpointFile)) {
     require_once $endpointFile;
 } else {
-    Response::error('Endpoint no encontrado', null, 404);
+    Response::error('Endpoint not found', null, 404);
 }

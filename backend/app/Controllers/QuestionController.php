@@ -22,7 +22,7 @@ class QuestionController
         $services = Service::all();
 
         if (self::isApiRequest()) {
-            Response::success('Preguntas obtenidas', $questions);
+            Response::success('Questions retrieved', $questions);
         } else {
             Response::view('questions/index', [
                 'questions' => $questions,
@@ -74,9 +74,9 @@ class QuestionController
 
         if (empty($data['service_id']) || empty($data['question_text'])) {
             if (self::isApiRequest()) {
-                Response::error('Servicio y texto de pregunta son requeridos');
+                Response::error('Service and question text are required');
             } else {
-                $_SESSION['error'] = 'Servicio y texto de pregunta son requeridos';
+                $_SESSION['error'] = 'Service and question text are required';
                 Response::redirect('/questions/create');
             }
         }
@@ -84,9 +84,9 @@ class QuestionController
         $id = Question::create($data);
 
         if (self::isApiRequest()) {
-            Response::success('Pregunta creada', ['id' => $id], 201);
+            Response::success('Question created', ['id' => $id], 201);
         } else {
-            $_SESSION['success'] = 'Pregunta creada exitosamente';
+            $_SESSION['success'] = 'Question created successfully';
             Response::redirect('/questions');
         }
     }
@@ -99,7 +99,7 @@ class QuestionController
         $question = Question::find($id);
         
         if (!$question) {
-            Response::notFound('Pregunta no encontrada');
+            Response::notFound('Question not found');
         }
 
         $services = Service::active();
@@ -120,7 +120,7 @@ class QuestionController
         $question = Question::find($id);
         
         if (!$question) {
-            Response::notFound('Pregunta no encontrada');
+            Response::notFound('Question not found');
         }
 
         $data = [
@@ -154,9 +154,9 @@ class QuestionController
         Question::update($id, $data);
 
         if (self::isApiRequest()) {
-            Response::success('Pregunta actualizada');
+            Response::success('Question updated');
         } else {
-            $_SESSION['success'] = 'Pregunta actualizada exitosamente';
+            $_SESSION['success'] = 'Question updated successfully';
             Response::redirect('/questions');
         }
     }
@@ -169,15 +169,15 @@ class QuestionController
         $question = Question::find($id);
         
         if (!$question) {
-            Response::notFound('Pregunta no encontrada');
+            Response::notFound('Question not found');
         }
 
         Question::delete($id);
 
         if (self::isApiRequest()) {
-            Response::success('Pregunta eliminada');
+            Response::success('Question deleted');
         } else {
-            $_SESSION['success'] = 'Pregunta eliminada exitosamente';
+            $_SESSION['success'] = 'Question deleted successfully';
             Response::redirect('/questions');
         }
     }

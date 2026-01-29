@@ -45,7 +45,7 @@ class CompanyController
         }
 
         if (self::isApiRequest()) {
-            Response::success('Empresa obtenida', $company);
+            Response::success('Company retrieved', $company);
         } else {
             $socialMedia = Company::getSocialMedia($company);
             $companyInfo = Company::getInfo($company['id']);
@@ -100,9 +100,9 @@ class CompanyController
         // Validación básica
         if (empty($data['name'])) {
             if (self::isApiRequest()) {
-                Response::error('El nombre de la empresa es requerido');
+                Response::error('Company name is required');
             } else {
-                $_SESSION['error'] = 'El nombre de la empresa es requerido';
+                $_SESSION['error'] = 'Company name is required';
                 Response::redirect('/companies/create');
             }
         }
@@ -118,9 +118,9 @@ class CompanyController
         }
 
         if (self::isApiRequest()) {
-            Response::success('Empresa creada', ['id' => $id], 201);
+            Response::success('Company created', ['id' => $id], 201);
         } else {
-            $_SESSION['success'] = 'Empresa creada exitosamente';
+            $_SESSION['success'] = 'Company created successfully';
             Response::redirect('/companies');
         }
     }
@@ -133,7 +133,7 @@ class CompanyController
         $company = Company::find($id);
         
         if (!$company) {
-            Response::notFound('Empresa no encontrada');
+            Response::notFound('Company not found');
         }
 
         $socialMedia = Company::getSocialMedia($company);
@@ -152,7 +152,7 @@ class CompanyController
         $company = Company::find($id);
         
         if (!$company) {
-            Response::notFound('Empresa no encontrada');
+            Response::notFound('Company not found');
         }
 
         $data = [
@@ -185,9 +185,9 @@ class CompanyController
         }
 
         if (self::isApiRequest()) {
-            Response::success('Empresa actualizada');
+            Response::success('Company updated');
         } else {
-            $_SESSION['success'] = 'Empresa actualizada exitosamente';
+            $_SESSION['success'] = 'Company updated successfully';
             Response::redirect('/companies');
         }
     }
@@ -200,15 +200,15 @@ class CompanyController
         $company = Company::find($id);
         
         if (!$company) {
-            Response::notFound('Empresa no encontrada');
+            Response::notFound('Company not found');
         }
 
         Company::delete($id);
 
         if (self::isApiRequest()) {
-            Response::success('Empresa eliminada');
+            Response::success('Company deleted');
         } else {
-            $_SESSION['success'] = 'Empresa eliminada exitosamente';
+            $_SESSION['success'] = 'Company deleted successfully';
             Response::redirect('/companies');
         }
     }

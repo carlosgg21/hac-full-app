@@ -27,7 +27,7 @@ class QuoteController
         }
 
         if (self::isApiRequest()) {
-            Response::success('Cotizaciones obtenidas', $quotes);
+            Response::success('Quotes retrieved', $quotes);
         } else {
             Response::view('quotes/index', ['quotes' => $quotes, 'status' => $status]);
         }
@@ -69,9 +69,9 @@ class QuoteController
 
         if (empty($data['client_id'])) {
             if (self::isApiRequest()) {
-                Response::error('Cliente es requerido');
+                Response::error('Client is required');
             } else {
-                $_SESSION['error'] = 'Cliente es requerido';
+                $_SESSION['error'] = 'Client is required';
                 Response::redirect('/quotes/create');
             }
         }
@@ -79,9 +79,9 @@ class QuoteController
         $id = Quote::create($data);
 
         if (self::isApiRequest()) {
-            Response::success('Cotización creada', ['id' => $id], 201);
+            Response::success('Quote created', ['id' => $id], 201);
         } else {
-            $_SESSION['success'] = 'Cotización creada exitosamente';
+            $_SESSION['success'] = 'Quote created successfully';
             Response::redirect('/quotes/' . $id);
         }
     }
@@ -94,11 +94,11 @@ class QuoteController
         $quote = Quote::find($id);
         
         if (!$quote) {
-            Response::notFound('Cotización no encontrada');
+            Response::notFound('Quote not found');
         }
 
         if (self::isApiRequest()) {
-            Response::success('Cotización obtenida', $quote);
+            Response::success('Quote retrieved', $quote);
         } else {
             Response::view('quotes/show', ['quote' => $quote]);
         }
@@ -112,7 +112,7 @@ class QuoteController
         $quote = Quote::find($id);
         
         if (!$quote) {
-            Response::notFound('Cotización no encontrada');
+            Response::notFound('Quote not found');
         }
 
         $clients = Client::all();
@@ -133,7 +133,7 @@ class QuoteController
         $quote = Quote::find($id);
         
         if (!$quote) {
-            Response::notFound('Cotización no encontrada');
+            Response::notFound('Quote not found');
         }
 
         $data = [
@@ -154,9 +154,9 @@ class QuoteController
         Quote::update($id, $data);
 
         if (self::isApiRequest()) {
-            Response::success('Cotización actualizada');
+            Response::success('Quote updated');
         } else {
-            $_SESSION['success'] = 'Cotización actualizada exitosamente';
+            $_SESSION['success'] = 'Quote updated successfully';
             Response::redirect('/quotes/' . $id);
         }
     }
@@ -169,15 +169,15 @@ class QuoteController
         $quote = Quote::find($id);
         
         if (!$quote) {
-            Response::notFound('Cotización no encontrada');
+            Response::notFound('Quote not found');
         }
 
         Quote::delete($id);
 
         if (self::isApiRequest()) {
-            Response::success('Cotización eliminada');
+            Response::success('Quote deleted');
         } else {
-            $_SESSION['success'] = 'Cotización eliminada exitosamente';
+            $_SESSION['success'] = 'Quote deleted successfully';
             Response::redirect('/quotes');
         }
     }
@@ -190,7 +190,7 @@ class QuoteController
         $quote = Quote::find($id);
         
         if (!$quote) {
-            Response::notFound('Cotización no encontrada');
+            Response::notFound('Quote not found');
         }
 
         // Actualizar estado a 'sent'
@@ -199,9 +199,9 @@ class QuoteController
         // TODO: Implementar envío de email
 
         if (self::isApiRequest()) {
-            Response::success('Cotización enviada');
+            Response::success('Quote sent');
         } else {
-            $_SESSION['success'] = 'Cotización enviada exitosamente';
+            $_SESSION['success'] = 'Quote sent successfully';
             Response::redirect('/quotes/' . $id);
         }
     }

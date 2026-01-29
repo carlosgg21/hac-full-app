@@ -49,7 +49,7 @@ class Router
         if ($matched) {
             $this->executeRoute($matched);
         } else {
-            Response::notFound('Ruta no encontrada: ' . $route);
+            Response::notFound('Route not found: ' . $route);
         }
     }
 
@@ -171,27 +171,27 @@ class Router
             $controllerPath = APP_PATH . '/Controllers/' . $controllerName . '.php';
             
             if (!file_exists($controllerPath)) {
-                Response::notFound('Controlador no encontrado: ' . $controllerName);
+                Response::notFound('Controller not found: ' . $controllerName);
             }
 
             require_once $controllerPath;
 
             // Verificar que la clase existe
             if (!class_exists($controllerName)) {
-                Response::notFound('Clase de controlador no encontrada: ' . $controllerName);
+                Response::notFound('Controller class not found: ' . $controllerName);
             }
 
             // Crear instancia y ejecutar método
             $controller = new $controllerName();
             
             if (!method_exists($controller, $methodName)) {
-                Response::notFound('Método no encontrado: ' . $methodName);
+                Response::notFound('Method not found: ' . $methodName);
             }
 
             // Pasar parámetros al método
             call_user_func_array([$controller, $methodName], $params);
         } else {
-            Response::notFound('Handler de ruta inválido');
+            Response::notFound('Invalid route handler');
         }
     }
 

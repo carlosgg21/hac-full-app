@@ -58,7 +58,7 @@ class Project
         $quote = Quote::find($quoteId);
         
         if (!$quote) {
-            throw new Exception('Cotización no encontrada');
+            throw new Exception('Quote not found');
         }
 
         $repo = new ProjectRepository();
@@ -70,7 +70,7 @@ class Project
             'quote_id' => $quoteId,
             'client_id' => $quote['client_id'],
             'project_number' => $projectNumber,
-            'name' => 'Proyecto ' . $quote['quote_number'],
+            'name' => 'Project ' . $quote['quote_number'],
             'status' => 'planning',
             'budget' => $quote['total_amount']
         ], $data);

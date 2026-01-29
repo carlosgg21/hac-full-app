@@ -21,7 +21,7 @@ class ServiceController
         $services = Service::all();
 
         if (self::isApiRequest()) {
-            Response::success('Servicios obtenidos', $services);
+            Response::success('Services retrieved', $services);
         } else {
             Response::view('services/index', ['services' => $services]);
         }
@@ -49,9 +49,9 @@ class ServiceController
         // Validación básica
         if (empty($data['name'])) {
             if (self::isApiRequest()) {
-                Response::error('El nombre del servicio es requerido');
+                Response::error('Service name is required');
             } else {
-                $_SESSION['error'] = 'El nombre del servicio es requerido';
+                $_SESSION['error'] = 'Service name is required';
                 Response::redirect('/services/create');
             }
         }
@@ -59,9 +59,9 @@ class ServiceController
         $id = Service::create($data);
 
         if (self::isApiRequest()) {
-            Response::success('Servicio creado', ['id' => $id], 201);
+            Response::success('Service created', ['id' => $id], 201);
         } else {
-            $_SESSION['success'] = 'Servicio creado exitosamente';
+            $_SESSION['success'] = 'Service created successfully';
             Response::redirect('/services');
         }
     }
@@ -74,7 +74,7 @@ class ServiceController
         $service = Service::find($id);
         
         if (!$service) {
-            Response::notFound('Servicio no encontrado');
+            Response::notFound('Service not found');
         }
 
         Response::view('services/edit', ['service' => $service]);
@@ -88,7 +88,7 @@ class ServiceController
         $service = Service::find($id);
         
         if (!$service) {
-            Response::notFound('Servicio no encontrado');
+            Response::notFound('Service not found');
         }
 
         $data = [
@@ -100,9 +100,9 @@ class ServiceController
         Service::update($id, $data);
 
         if (self::isApiRequest()) {
-            Response::success('Servicio actualizado');
+            Response::success('Service updated');
         } else {
-            $_SESSION['success'] = 'Servicio actualizado exitosamente';
+            $_SESSION['success'] = 'Service updated successfully';
             Response::redirect('/services');
         }
     }
@@ -115,15 +115,15 @@ class ServiceController
         $service = Service::find($id);
         
         if (!$service) {
-            Response::notFound('Servicio no encontrado');
+            Response::notFound('Service not found');
         }
 
         Service::delete($id);
 
         if (self::isApiRequest()) {
-            Response::success('Servicio eliminado');
+            Response::success('Service deleted');
         } else {
-            $_SESSION['success'] = 'Servicio eliminado exitosamente';
+            $_SESSION['success'] = 'Service deleted successfully';
             Response::redirect('/services');
         }
     }

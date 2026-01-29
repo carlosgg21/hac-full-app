@@ -164,7 +164,7 @@ class Response
         $viewPath = APP_PATH . '/Views/' . $view . '.php';
         
         if (!file_exists($viewPath)) {
-            throw new Exception("Vista no encontrada: {$view}");
+            throw new Exception("View not found: {$view}");
         }
 
         require $viewPath;
@@ -173,7 +173,7 @@ class Response
     /**
      * Enviar respuesta 404
      */
-    public static function notFound($message = 'Recurso no encontrado')
+    public static function notFound($message = 'Resource not found')
     {
         http_response_code(404);
         if (self::isApiRequest()) {
@@ -187,7 +187,7 @@ class Response
     /**
      * Enviar respuesta 403
      */
-    public static function forbidden($message = 'Acceso denegado')
+    public static function forbidden($message = 'Access denied')
     {
         http_response_code(403);
         if (self::isApiRequest()) {
@@ -201,7 +201,7 @@ class Response
     /**
      * Enviar respuesta 401
      */
-    public static function unauthorized($message = 'No autorizado')
+    public static function unauthorized($message = 'Unauthorized')
     {
         http_response_code(401);
         if (self::isApiRequest()) {

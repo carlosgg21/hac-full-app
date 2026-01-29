@@ -12,34 +12,34 @@ switch ($method) {
         $password = $_POST['password'] ?? json_decode(file_get_contents('php://input'), true)['password'] ?? '';
 
         if (empty($username) || empty($password)) {
-            Response::error('Usuario y contraseña son requeridos', null, 400);
+            Response::error('Username and password are required', null, 400);
         }
 
         $user = User::authenticate($username, $password);
 
         if ($user) {
             Auth::login($user);
-            Response::success('Login exitoso', ['user' => Auth::user()]);
+            Response::success('Login successful', ['user' => Auth::user()]);
         } else {
-            Response::error('Credenciales inválidas', null, 401);
+            Response::error('Invalid credentials', null, 401);
         }
         break;
 
     case 'DELETE':
         // Logout
         Auth::logout();
-        Response::success('Sesión cerrada');
+        Response::success('Session closed');
         break;
 
     case 'GET':
         // Verificar autenticación
         if (Auth::check()) {
-            Response::success('Usuario autenticado', ['user' => Auth::user()]);
+            Response::success('User authenticated', ['user' => Auth::user()]);
         } else {
-            Response::error('No autenticado', null, 401);
+            Response::error('Not authenticated', null, 401);
         }
         break;
 
     default:
-        Response::error('Método no permitido', null, 405);
+        Response::error('Method not allowed', null, 405);
 }

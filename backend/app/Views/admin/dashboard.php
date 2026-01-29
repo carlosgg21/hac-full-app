@@ -6,7 +6,7 @@ ob_start();
 <!-- Cards de Estadísticas - Arriba en 1-2 filas -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
     <div class="bg-white rounded-xl shadow-md px-6 py-5">
-        <h3 class="text-sm text-gray-600 mb-2">Total Clientes</h3>
+        <h3 class="text-sm text-gray-600 mb-2">Total Clients</h3>
         <p class="text-3xl font-bold" style="color: #1e3a5f;"><?= $stats['total_clients'] ?? 0 ?></p>
     </div>
     
@@ -16,12 +16,12 @@ ob_start();
     </div>
     
     <div class="bg-white rounded-xl shadow-md px-6 py-5">
-        <h3 class="text-sm text-gray-600 mb-2">Cotizaciones Pendientes</h3>
+        <h3 class="text-sm text-gray-600 mb-2">Pending Quotes</h3>
         <p class="text-3xl font-bold" style="color: #e67e22;"><?= $stats['pending_quotes'] ?? 0 ?></p>
     </div>
     
     <div class="bg-white rounded-xl shadow-md px-6 py-5">
-        <h3 class="text-sm text-gray-600 mb-2">Total Proyectos</h3>
+        <h3 class="text-sm text-gray-600 mb-2">Total Projects</h3>
         <p class="text-3xl font-bold" style="color: #1e3a5f;"><?= $stats['total_projects'] ?? 0 ?></p>
     </div>
     
@@ -49,7 +49,7 @@ ob_start();
 <!-- Tablas de Recientes -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <div class="bg-white rounded-xl shadow-md px-6 py-5">
-        <h3 class="text-lg font-semibold mb-4 text-gray-800">Cotizaciones Recientes</h3>
+        <h3 class="text-lg font-semibold mb-4 text-gray-800">Recent Quotes</h3>
         <div class="overflow-x-auto">
             <table class="min-w-full">
                 <thead>
@@ -96,13 +96,13 @@ ob_start();
     </div>
     
     <div class="bg-white rounded-xl shadow-md px-6 py-5">
-        <h3 class="text-lg font-semibold mb-4 text-gray-800">Proyectos Recientes</h3>
+        <h3 class="text-lg font-semibold mb-4 text-gray-800">Recent Projects</h3>
         <div class="overflow-x-auto">
             <table class="min-w-full">
                 <thead>
                     <tr class="bg-gray-100 text-gray-700 border-b border-gray-200">
                         <th class="py-3 px-4 text-left text-sm font-semibold">Número</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold">Nombre</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold">Name</th>
                         <th class="py-3 px-4 text-left text-sm font-semibold">Estado</th>
                         <th class="py-3 px-4 text-left text-sm font-semibold">Progreso</th>
                     </tr>

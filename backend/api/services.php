@@ -7,15 +7,15 @@
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 if ($method !== 'GET') {
-    Response::error('Método no permitido', null, 405);
+    Response::error('Method not allowed', null, 405);
 }
 
-// Parámetros opcionales desde query string
-$fields = null;
+// Parámetros desde query string; por defecto para API: solo id, name, description y orden por name
+$fields = ['id', 'name', 'description'];
 if (!empty($_GET['fields'])) {
     $fields = array_map('trim', explode(',', $_GET['fields']));
 }
-$orderBy = !empty($_GET['order_by']) ? trim($_GET['order_by']) : null;
+$orderBy = !empty($_GET['order_by']) ? trim($_GET['order_by']) : 'name ASC';
 
 $services = Service::active($fields, $orderBy);
-Response::success('Servicios obtenidos', $services);
+Response::success('Services retrieved', $services);

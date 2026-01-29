@@ -27,7 +27,7 @@ class ClientController
         }
 
         if (self::isApiRequest()) {
-            Response::success('Clientes obtenidos', $clients);
+            Response::success('Clients retrieved', $clients);
         } else {
             Response::view('clients/index', ['clients' => $clients, 'search' => $search]);
         }
@@ -66,9 +66,9 @@ class ClientController
         // Validación básica
         if (empty($data['first_name']) || empty($data['last_name']) || empty($data['email'])) {
             if (self::isApiRequest()) {
-                Response::error('Nombre, apellido y email son requeridos');
+                Response::error('First name, last name and email are required');
             } else {
-                $_SESSION['error'] = 'Nombre, apellido y email son requeridos';
+                $_SESSION['error'] = 'First name, last name and email are required';
                 $_SESSION['client_form'] = $data;
                 Response::redirect('/clients/create');
             }
@@ -77,9 +77,9 @@ class ClientController
         $id = Client::create($data);
 
         if (self::isApiRequest()) {
-            Response::success('Cliente creado', ['id' => $id], 201);
+            Response::success('Client created', ['id' => $id], 201);
         } else {
-            $_SESSION['success'] = 'Cliente creado exitosamente';
+            $_SESSION['success'] = 'Client created successfully';
             Response::redirect('/clients/' . $id);
         }
     }
@@ -92,13 +92,13 @@ class ClientController
         $client = Client::find($id);
         
         if (!$client) {
-            Response::notFound('Cliente no encontrado');
+            Response::notFound('Client not found');
         }
 
         $quotes = Quote::findByClient($id);
 
         if (self::isApiRequest()) {
-            Response::success('Cliente obtenido', ['client' => $client, 'quotes' => $quotes]);
+            Response::success('Client retrieved', ['client' => $client, 'quotes' => $quotes]);
         } else {
             Response::view('clients/show', ['client' => $client, 'quotes' => $quotes]);
         }
@@ -112,7 +112,7 @@ class ClientController
         $client = Client::find($id);
         
         if (!$client) {
-            Response::notFound('Cliente no encontrado');
+            Response::notFound('Client not found');
         }
 
         Response::view('clients/edit', ['client' => $client]);
@@ -126,7 +126,7 @@ class ClientController
         $client = Client::find($id);
         
         if (!$client) {
-            Response::notFound('Cliente no encontrado');
+            Response::notFound('Client not found');
         }
 
         $data = [
@@ -145,9 +145,9 @@ class ClientController
         Client::update($id, $data);
 
         if (self::isApiRequest()) {
-            Response::success('Cliente actualizado');
+            Response::success('Client updated');
         } else {
-            $_SESSION['success'] = 'Cliente actualizado exitosamente';
+            $_SESSION['success'] = 'Client updated successfully';
             Response::redirect('/clients/' . $id);
         }
     }
@@ -160,15 +160,15 @@ class ClientController
         $client = Client::find($id);
         
         if (!$client) {
-            Response::notFound('Cliente no encontrado');
+            Response::notFound('Client not found');
         }
 
         Client::delete($id);
 
         if (self::isApiRequest()) {
-            Response::success('Cliente eliminado');
+            Response::success('Client deleted');
         } else {
-            $_SESSION['success'] = 'Cliente eliminado exitosamente';
+            $_SESSION['success'] = 'Client deleted successfully';
             Response::redirect('/clients');
         }
     }

@@ -60,7 +60,7 @@ class ReportController
         }
 
         if (self::isApiRequest()) {
-            Response::success('Reporte de cotizaciones', [
+            Response::success('Quotes report', [
                 'quotes' => $quotes,
                 'stats' => $stats
             ]);
@@ -117,7 +117,7 @@ class ReportController
         }
 
         if (self::isApiRequest()) {
-            Response::success('Reporte de proyectos', [
+            Response::success('Projects report', [
                 'projects' => $projects,
                 'stats' => $stats
             ]);

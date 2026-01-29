@@ -1,5 +1,5 @@
 <?php
-$title = 'Crear Empresa';
+$title = 'Create Company';
 ob_start();
 ?>
 

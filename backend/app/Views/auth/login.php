@@ -72,7 +72,7 @@
         
         <form method="POST" action="<?= Response::url('/login') ?>">
             <div class="form-group">
-                <label for="username">Usuario</label>
+                <label for="username">Username</label>
                 <input type="text" id="username" name="username" required autofocus>
             </div>
             
@@ -81,7 +81,7 @@
                 <input type="password" id="password" name="password" required>
             </div>
             
-            <button type="submit" class="btn">Iniciar Sesión</button>
+            <button type="submit" class="btn">Log in</button>
         </form>
     </div>
 </body>

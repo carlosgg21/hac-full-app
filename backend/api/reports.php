@@ -29,5 +29,5 @@ switch ($method) {
         break;
 
     default:
-        Response::error('Método no permitido', null, 405);
+        Response::error('Method not allowed', null, 405);
 }

@@ -27,9 +27,9 @@ class AuthController
 
         if (empty($username) || empty($password)) {
             if (self::isApiRequest()) {
-                Response::error('Usuario y contraseña son requeridos');
+                Response::error('Username and password are required');
             } else {
-                $_SESSION['error'] = 'Usuario y contraseña son requeridos';
+                $_SESSION['error'] = 'Username and password are required';
                 Response::redirect('/login');
             }
         }
@@ -40,7 +40,7 @@ class AuthController
             Auth::login($user);
             
             if (self::isApiRequest()) {
-                Response::success('Login exitoso', ['user' => Auth::user()]);
+                Response::success('Login successful', ['user' => Auth::user()]);
             } else {
                 // Debug antes de redirect
                 if (defined('APP_ENV') && APP_ENV === 'development') {
@@ -53,9 +53,9 @@ class AuthController
             }
         } else {
             if (self::isApiRequest()) {
-                Response::error('Credenciales inválidas', null, 401);
+                Response::error('Invalid credentials', null, 401);
             } else {
-                $_SESSION['error'] = 'Credenciales inválidas';
+                $_SESSION['error'] = 'Invalid credentials';
                 Response::redirect('/login');
             }
         }
@@ -69,7 +69,7 @@ class AuthController
         Auth::logout();
         
         if (self::isApiRequest()) {
-            Response::success('Sesión cerrada');
+            Response::success('Session closed');
         } else {
             Response::redirect('/login');
         }

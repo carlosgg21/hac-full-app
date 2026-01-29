@@ -1,5 +1,5 @@
 <?php
-$title = 'Clientes';
+$title = 'Clients';
 $clientsCount = is_array($clients) ? count($clients) : 0;
 $searchValue = $search ?? '';
 ob_start();

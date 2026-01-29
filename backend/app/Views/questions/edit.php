@@ -1,5 +1,5 @@
 <?php
-$title = 'Editar Pregunta';
+$title = 'Edit Question';
 ob_start();
 ?>
 

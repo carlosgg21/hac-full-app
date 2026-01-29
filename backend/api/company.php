@@ -4,7 +4,7 @@
  */
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
-    Response::error('Método no permitido', null, 405);
+    Response::error('Method not allowed', null, 405);
 }
 
 // Obtener la primera compañía
@@ -40,4 +40,4 @@ header('Cache-Control: no-cache, no-store, must-revalidate');
 header('Pragma: no-cache');
 header('Expires: 0');
 
-Response::success('Información de compañía obtenida', $response);
+Response::success('Company information retrieved', $response);

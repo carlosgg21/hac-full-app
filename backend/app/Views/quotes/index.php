@@ -1,5 +1,5 @@
 <?php
-$title = 'Cotizaciones';
+$title = 'Quotes';
 ob_start();
 ?>
 
