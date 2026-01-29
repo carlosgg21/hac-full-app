@@ -91,10 +91,15 @@ class ServiceController
             Response::notFound('Service not found');
         }
 
+        // is_active: explicit "0" or 0 → inactive; anything else sent (e.g. "1", "on" from checkbox) → active
+        $isActive = 0;
+        if (array_key_exists('is_active', $_POST)) {
+            $isActive = ($_POST['is_active'] === '0' || $_POST['is_active'] === 0) ? 0 : 1;
+        }
         $data = [
             'name' => $_POST['name'] ?? $service['name'],
             'description' => $_POST['description'] ?? $service['description'],
-            'is_active' => isset($_POST['is_active']) ? 1 : 0
+            'is_active' => $isActive
         ];
 
         Service::update($id, $data);

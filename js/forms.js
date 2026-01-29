@@ -95,27 +95,22 @@ function initForms() {
     }
 
     try {
-      // TODO: POST to backend API (e.g. /backend/api/quote-request) when endpoint is ready
-      // const apiBase = window.location.origin + (window.BASE_PATH_URL || '/backend')
-      // const res = await fetch(apiBase + '/api/quote-request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ client: {...}, answers: {...}, captcha_answer, csrf_token }) })
-
+      if (typeof API !== "undefined" && API.post) {
+        await API.post("quote-request", data)
+      }
       const successMessage = currentLanguage === "en"
         ? "Thank you! Your quote request has been submitted. We will contact you soon."
         : "Merci! Votre demande de devis a été soumise. Nous vous contacterons bientôt."
-
       alert(successMessage)
-
       quoteWizardForm.reset()
       const contactForm = document.getElementById("contactForm")
-      if (contactForm) {
-        contactForm.reset()
-      }
+      if (contactForm) contactForm.reset()
       closeWizard()
     } catch (error) {
       console.error("Error:", error)
       const errorMessage = currentLanguage === "en"
-        ? "There was an error submitting your request. Please try again or contact us directly."
-        : "Une erreur s'est produite lors de l'envoi de votre demande. Veuillez réessayer ou nous contacter directement."
+        ? (error.message || "There was an error submitting your request. Please try again or contact us directly.")
+        : (error.message || "Une erreur s'est produite lors de l'envoi de votre demande. Veuillez réessayer ou nous contacter directement.")
       alert(errorMessage)
     } finally {
       if (wizardSubmitBtn) {

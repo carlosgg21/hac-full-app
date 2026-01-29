@@ -1,0 +1,718 @@
+openapi: 3.0.3
+info:
+  title: H.A.C. Renovation API
+  description: REST API for the H.A.C. Renovation backend. All responses are JSON.
+  version: 1.0.0
+  contact:
+    name: H.A.C. Renovation Inc.
+
+servers:
+  - url: /backend/api
+    description: Backend API (relative to your host)
+  - url: https://example.com/backend/api
+    description: Example production
+
+tags:
+  - name: Auth
+    description: Login, session check, logout (no auth required)
+  - name: Public
+    description: Endpoints without authentication
+  - name: Clients
+    description: Client CRUD (auth required)
+  - name: Quotes
+    description: Quote CRUD (auth required)
+  - name: Projects
+    description: Project CRUD (auth required)
+  - name: Reports
+    description: Reports (auth required)
+
+paths:
+  /auth:
+    get:
+      tags: [Auth]
+      summary: Check session
+      description: Returns current user if authenticated.
+      responses:
+        '200':
+          description: User authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessWithUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Auth]
+      summary: Login
+      description: Creates a session. Send username and password (JSON or form).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string, description: User login }
+                password: { type: string, format: password }
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string }
+                password: { type: string, format: password }
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessWithUser'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Auth]
+      summary: Logout
+      description: Destroys the current session.
+      responses:
+        '200':
+          description: Session closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /company:
+    get:
+      tags: [Public]
+      summary: Company info
+      description: Returns the first company record and related info (contact, social, stats).
+      responses:
+        '200':
+          description: Company information retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessWithData'
+              example:
+                success: true
+                message: Company information retrieved
+                data:
+                  id: 1
+                  name: H.A.C. Renovation Inc.
+                  logo: null
+                  email: info@example.com
+                  phone: "(438) 989-5253"
+                  address: "2504 Place Keller"
+                  social_media: {}
+                  info:
+                    years_experience: 15
+                    total_projects: 100
+                    client_satisfaction: 99
+        '404':
+          description: Company not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /services:
+    get:
+      tags: [Public]
+      summary: Active services
+      description: List of active services. Used by the frontend (e.g. quote form).
+      parameters:
+        - name: fields
+          in: query
+          description: Comma-separated columns (id, name, description, is_active, created_at, updated_at)
+          schema:
+            type: string
+            default: id,name,description
+        - name: order_by
+          in: query
+          description: Sort (e.g. name ASC, created_at DESC)
+          schema:
+            type: string
+            default: name ASC
+      responses:
+        '200':
+          description: Services retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: Services retrieved }
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Service'
+
+  /questions:
+    get:
+      tags: [Public]
+      summary: Questions
+      description: List of active questions, optionally filtered by service.
+      parameters:
+        - name: service_id
+          in: query
+          description: If present, only questions for that service
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Questions retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Question'
+
+  /quote-request:
+    post:
+      tags: [Public]
+      summary: Submit quote request
+      description: Creates a client and a quote in status "request" from the landing-page wizard. Public.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuoteRequest'
+      responses:
+        '201':
+          description: Quote request submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+                  data:
+                    type: object
+                    properties:
+                      id: { type: integer, description: Quote ID }
+                      client_id: { type: integer }
+        '400':
+          description: Name and email are required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /clients:
+    get:
+      tags: [Clients]
+      summary: List clients
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: search
+          in: query
+          description: Search by name, email, phone
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Clients retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessArray'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Clients]
+      summary: Create client
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientBody'
+      responses:
+        '201':
+          description: Client created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+                  data:
+                    type: object
+                    properties:
+                      id: { type: integer }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /clients/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Clients]
+      summary: Get client
+      description: One client with quotes
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Client retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessWithData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Clients]
+      summary: Update client
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessOk'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Clients]
+      summary: Delete client
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessOk'
+        '400':
+          description: ID required
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /quotes:
+    get:
+      tags: [Quotes]
+      summary: List quotes
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Quotes retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessArray'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Quotes]
+      summary: Create quote
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [client_id]
+              properties:
+                client_id: { type: integer }
+                status: { type: string, default: draft }
+                total_amount: { type: number }
+                currency: { type: string }
+                notes: { type: string }
+                metadata: { type: object }
+                answers: { type: object }
+      responses:
+        '201':
+          description: Quote created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+                  data:
+                    type: object
+                    properties:
+                      id: { type: integer }
+        '400':
+          description: Client is required
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /quotes/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Quotes]
+      summary: Get quote
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessWithData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Quotes]
+      summary: Update quote
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_id: { type: integer }
+                status: { type: string }
+                total_amount: { type: number }
+                currency: { type: string }
+                notes: { type: string }
+                metadata: { type: object }
+                answers: { type: object }
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessOk'
+        '400':
+          description: ID required
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Quotes]
+      summary: Delete quote
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessOk'
+        '400':
+          description: ID required
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /quotes/{id}/send:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Quotes]
+      summary: Send quote (GET)
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessWithData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [Quotes]
+      summary: Send quote (POST)
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessWithData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /projects:
+    get:
+      tags: [Projects]
+      summary: List projects
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Projects retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessArray'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Projects]
+      summary: Create project
+      description: Requires quote_id and related fields.
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quote_id]
+              properties:
+                quote_id: { type: integer }
+                name: { type: string }
+                description: { type: string }
+                status: { type: string }
+                start_date: { type: string, format: date }
+                end_date: { type: string, format: date }
+      responses:
+        '201':
+          description: Project created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+                  data:
+                    type: object
+                    properties:
+                      id: { type: integer }
+        '400':
+          description: Quote ID is required
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /projects/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Projects]
+      summary: Get project
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessWithData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Projects]
+      summary: Update project
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                description: { type: string }
+                status: { type: string }
+                start_date: { type: string }
+                end_date: { type: string }
+                budget: { type: number }
+                progress: { type: number }
+                notes: { type: string }
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessOk'
+        '400':
+          description: ID required
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /reports:
+    get:
+      tags: [Reports]
+      summary: Reports index
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessWithData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /reports/quotes:
+    get:
+      tags: [Reports]
+      summary: Quotes report
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Quotes report data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessWithData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /reports/projects:
+    get:
+      tags: [Reports]
+      summary: Projects report
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Projects report data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessWithData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: PHPSESSID
+      description: Session cookie after login via POST /api/auth
+
+  parameters:
+    IdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Resource ID
+
+  responses:
+    BadRequest:
+      description: Bad Request (e.g. validation)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            message: Not authenticated
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    SuccessOk:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SuccessMessage'
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        message: { type: string }
+        errors: { type: array, nullable: true }
+    SuccessMessage:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string }
+    SuccessWithData:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string }
+        data: { type: object }
+    SuccessWithUser:
+      type: object
+      properties:
+        success: { type: boolean }
+        message: { type: string }
+        data:
+          type: object
+          properties:
+            user: { type: object }
+    SuccessArray:
+      type: object
+      properties:
+        success: { type: boolean }
+        message: { type: string }
+        data: { type: array, items: {} }
+    Service:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+    Question:
+      type: object
+      properties:
+        id: { type: integer }
+        service_id: { type: integer }
+        text: { type: string }
+        order_index: { type: integer }
+        is_active: { type: integer }
+    QuoteRequest:
+      type: object
+      required: [name, email]
+      properties:
+        name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        address: { type: string }
+        message: { type: string }
+        project_type: { type: string }
+        portfolio_project: { type: string }
+        property_type: { type: string }
+        square_feet: { type: string }
+        budget: { type: string }
+        timeline: { type: string }
+        preferred_contact: { type: string }
+        is_owner: { type: string }
+        privacy_policy: { type: string }
+        bathroom_goal: { type: string }
+        bathroom_layout: { type: string }
+        kitchen_goal: { type: string }
+        kitchen_layout: { type: string }
+        city: { type: string }
+        state: { type: string }
+        zip_code: { type: string }
+        country: { type: string }
+    ClientBody:
+      type: object
+      properties:
+        first_name: { type: string }
+        last_name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        address: { type: string }
+        city: { type: string }
+        state: { type: string }
+        zip_code: { type: string }
+        country: { type: string }
+        notes: { type: string }
