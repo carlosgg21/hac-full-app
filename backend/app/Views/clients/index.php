@@ -14,13 +14,13 @@ ob_start();
                 <i class="bi bi-people text-2xl"></i>
             </div>
             <div>
-                <h1 class="text-2xl font-bold text-gray-800">Contacts</h1>
+                <h1 class="text-2xl font-bold text-gray-800">Clients</h1>
                 <p id="clientsCount" class="text-sm text-gray-500 mt-0.5"><?= $clientsCount ?> <?= $clientsCount === 1 ? 'contact registered' : 'contacts registered' ?></p>
             </div>
         </div>
         <a href="<?= Response::url('/clients/create') ?>" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition shadow-sm">
             <i class="bi bi-person-plus text-lg"></i>
-            New Contact
+            New Client
         </a>
     </div>
 </div>
