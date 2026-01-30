@@ -67,9 +67,101 @@
         });
     }
 
+    function getApiBase() {
+        var wrap = document.getElementById('clientListWrap');
+        return (wrap && wrap.getAttribute('data-api-base')) ? wrap.getAttribute('data-api-base') : '/backend/api';
+    }
+
+    function initNotesModal() {
+        var modal = document.getElementById('clientNotesModal');
+        var textarea = document.getElementById('clientNotesTextarea');
+        var saveBtn = document.getElementById('clientNotesSave');
+        var clearBtn = document.getElementById('clientNotesClear');
+        var cancelBtn = document.getElementById('clientNotesCancel');
+        if (!modal || !textarea || !saveBtn || !clearBtn || !cancelBtn) return;
+
+        var currentClientId = null;
+        var currentRow = null;
+
+        function closeModal() {
+            currentClientId = null;
+            currentRow = null;
+            modal.close();
+        }
+
+        function openModal(clientId, notesText, row) {
+            currentClientId = clientId;
+            currentRow = row;
+            textarea.value = notesText || '';
+            modal.showModal();
+        }
+
+        function updateRowNotes(row, newNotes) {
+            if (!row) return;
+            var notesSpan = row.querySelector('.client-notes-text');
+            var iconWrap = row.querySelector('.client-notes-cell i');
+            if (notesSpan) notesSpan.textContent = newNotes || '';
+            if (iconWrap) {
+                iconWrap.className = (newNotes && newNotes.trim()) ? 'bi bi-file-earmark-check text-green-600 text-lg' : 'bi bi-file-earmark text-gray-400 text-lg';
+            }
+        }
+
+        document.getElementById('clientListWrap').addEventListener('click', function(e) {
+            var cell = e.target.closest('.client-notes-cell');
+            if (!cell) return;
+            e.preventDefault();
+            var row = cell.closest('tr');
+            var clientId = row ? row.getAttribute('data-client-id') : null;
+            var notesSpan = row ? row.querySelector('.client-notes-text') : null;
+            var notesText = notesSpan ? notesSpan.textContent : '';
+            if (clientId) openModal(clientId, notesText, row);
+        });
+
+        cancelBtn.addEventListener('click', closeModal);
+        modal.addEventListener('cancel', closeModal);
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) closeModal();
+        });
+
+        function putNotes(id, notes, onSuccess) {
+            var base = getApiBase();
+            var xhr = new XMLHttpRequest();
+            xhr.open('PUT', base + '/clients/' + id, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState !== 4) return;
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    if (onSuccess) onSuccess();
+                } else {
+                    alert('Failed to save notes. Please try again.');
+                }
+            };
+            xhr.onerror = function() { alert('Failed to save notes. Please try again.'); };
+            xhr.send(JSON.stringify({ notes: notes }));
+        }
+
+        saveBtn.addEventListener('click', function() {
+            if (currentClientId == null || !currentRow) return;
+            var value = (textarea.value || '').trim();
+            putNotes(currentClientId, value, function() {
+                updateRowNotes(currentRow, value);
+                closeModal();
+            });
+        });
+
+        clearBtn.addEventListener('click', function() {
+            if (currentClientId == null || !currentRow) return;
+            putNotes(currentClientId, '', function() {
+                updateRowNotes(currentRow, '');
+                closeModal();
+            });
+        });
+    }
+
     function init() {
         initActionsMenu();
         initIndexFilter();
+        initNotesModal();
     }
 
     if (document.readyState === 'loading') {

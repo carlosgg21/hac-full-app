@@ -6,7 +6,7 @@ ob_start();
 ?>
 
 <?php $basePath = defined('BASE_PATH_URL') ? BASE_PATH_URL : '/backend'; ?>
-<div id="clientListWrap" class="client-list-page">
+<div id="clientListWrap" class="client-list-page" data-api-base="<?= htmlspecialchars($basePath) ?>/api">
 <div class="mb-6">
     <div class="flex items-center justify-between flex-wrap gap-4">
         <div class="flex items-center gap-3">
@@ -18,8 +18,8 @@ ob_start();
                 <p id="clientsCount" class="text-sm text-gray-500 mt-0.5"><?= $clientsCount ?> <?= $clientsCount === 1 ? 'contact registered' : 'contacts registered' ?></p>
             </div>
         </div>
-        <a href="<?= Response::url('/clients/create') ?>" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition shadow-sm">
-            <i class="bi bi-person-plus text-lg"></i>
+        <a href="<?= Response::url('/clients/create') ?>" class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition shadow-sm">
+            <i class="bi bi-person-plus text-base"></i>
             New Client
         </a>
     </div>
@@ -85,7 +85,7 @@ ob_start();
                     }
                     $hasNotes = !empty(trim($client['notes'] ?? ''));
                     ?>
-                    <tr class="border-b border-gray-100 hover:bg-gray-50/80 transition" data-client-name="<?= htmlspecialchars($client['full_name'] ?? '') ?>">
+                    <tr class="border-b border-gray-100 hover:bg-gray-50/80 transition" data-client-id="<?= (int)($client['id'] ?? 0) ?>" data-client-name="<?= htmlspecialchars($client['full_name'] ?? '') ?>">
                         <td class="py-3 px-4">
                             <div class="flex items-center gap-3">
                                 <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-sm font-medium">
@@ -106,17 +106,12 @@ ob_start();
                                 <?= htmlspecialchars($client['phone'] ?? '—') ?>
                             </span>
                         </td>
-                        <td class="py-3 px-4">
+                        <td class="py-3 px-4 client-notes-cell cursor-pointer hover:bg-gray-100/80 rounded" data-action="open-notes-modal" role="button" tabindex="0" aria-label="Open notes">
+                            <span class="sr-only hidden client-notes-text"><?= htmlspecialchars($client['notes'] ?? '') ?></span>
                             <?php if ($hasNotes): ?>
-                                <span class="inline-flex items-center gap-2 text-sm text-green-700">
-                                    <i class="bi bi-file-earmark-check text-green-600"></i>
-                                    Has notes
-                                </span>
+                                <i class="bi bi-file-earmark-check text-green-600 text-lg"></i>
                             <?php else: ?>
-                                <span class="inline-flex items-center gap-2 text-sm text-gray-400">
-                                    <i class="bi bi-file-earmark text-gray-400"></i>
-                                    No notes
-                                </span>
+                                <i class="bi bi-file-earmark text-gray-400 text-lg"></i>
                             <?php endif; ?>
                         </td>
                         <td class="py-3 px-4">
@@ -125,13 +120,13 @@ ob_start();
                                     <i class="bi bi-three-dots-vertical text-lg"></i>
                                 </button>
                                 <div class="client-actions-menu hidden absolute right-0 top-full mt-1 py-1 w-44 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                                    <a href="<?= Response::url('/clients/' . $client['id'] . '/edit') ?>" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-t-lg">
+                                    <a href="<?= Response::url('/clients/' . $client['id']) ?>" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-t-lg">
+                                        <i class="bi bi-eye"></i>
+                                        Show
+                                    </a>
+                                    <a href="<?= Response::url('/clients/' . $client['id'] . '/edit') ?>" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg">
                                         <i class="bi bi-pencil"></i>
                                         Edit
-                                    </a>
-                                    <a href="<?= Response::url('/clients/' . $client['id']) ?>" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg">
-                                        <i class="bi bi-receipt"></i>
-                                        Show Quote
                                     </a>
                                 </div>
                             </div>
@@ -149,6 +144,22 @@ ob_start();
     </table>
 </section>
 </div>
+
+<dialog id="clientNotesModal" class="rounded-xl shadow-xl border border-gray-200 p-0 max-w-lg w-full backdrop:bg-black/30" aria-labelledby="clientNotesModalTitle" aria-modal="true">
+    <div class="bg-white rounded-xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 id="clientNotesModalTitle" class="text-lg font-semibold text-gray-800">Client notes</h2>
+        </div>
+        <div class="px-6 py-4">
+            <textarea id="clientNotesTextarea" rows="6" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition text-gray-700 placeholder-gray-400" placeholder="Notes about this client..."></textarea>
+        </div>
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+            <button type="button" id="clientNotesCancel" class="px-4 py-2.5 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition">Cancel</button>
+            <button type="button" id="clientNotesClear" class="px-4 py-2.5 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition">Clear</button>
+            <button type="button" id="clientNotesSave" class="px-4 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary-light transition">Save</button>
+        </div>
+    </div>
+</dialog>
 
 <script src="<?= htmlspecialchars($basePath) ?>/public/assets/js/client.js"></script>
 
