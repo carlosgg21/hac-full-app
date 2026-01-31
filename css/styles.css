@@ -75,6 +75,15 @@ button,
   }
 }
 
+/* Footer content fade-in when loaded from API */
+.footer-content {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.footer-content.footer-loaded {
+  opacity: 1;
+}
+
 /* Scroll to Top Button */
 .scroll-to-top-btn {
   position: fixed;
