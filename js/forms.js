@@ -1,5 +1,34 @@
+// Max lengths for contact form (match index.html maxlength)
+const CONTACT_FIELD_MAX = { name: 200, email: 254, phone: 30, message: 2000 }
+
+function isValidEmailFormat(value) {
+  if (typeof value !== 'string' || !value.trim()) return false
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()) && value.length <= CONTACT_FIELD_MAX.email
+}
+
+function initContactFormValidation() {
+  const form = document.getElementById('contactForm')
+  const emailEl = document.getElementById('contactEmail')
+  if (!form || !emailEl) return
+  emailEl.addEventListener('blur', function () {
+    const v = (this.value || '').trim()
+    if (v && !isValidEmailFormat(this.value)) {
+      this.setCustomValidity(typeof currentLanguage !== 'undefined' && currentLanguage === 'fr'
+        ? 'Veuillez entrer une adresse courriel valide (max. 254 caractères).'
+        : 'Please enter a valid email address (max. 254 characters).')
+    } else {
+      this.setCustomValidity('')
+    }
+  })
+  emailEl.addEventListener('input', function () {
+    if (this.validationMessage) this.setCustomValidity('')
+  })
+}
+
 // Initialize forms
 function initForms() {
+  initContactFormValidation()
+
   const quoteWizardForm = getWizardForm()
   if (!quoteWizardForm) {
     console.warn("Quote wizard form not found")

@@ -531,7 +531,8 @@
                             <input type="text" 
                                    id="contactName"
                                    name="name"
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors" 
+                                   maxlength="200"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors" 
                                    required>
                         </div>
 
@@ -540,7 +541,8 @@
                             <input type="email" 
                                    id="contactEmail"
                                    name="email"
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors" 
+                                   maxlength="254"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors" 
                                    required>
                         </div>
 
@@ -549,7 +551,8 @@
                             <input type="tel" 
                                    id="contactPhone"
                                    name="phone"
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
+                                   maxlength="30"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
                         </div>
 
                         <div>
@@ -557,7 +560,8 @@
                             <textarea rows="4" 
                                       id="contactMessage"
                                       name="message"
-                                      class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors" 
+                                      maxlength="2000"
+                                      class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors" 
                                       required></textarea>
                         </div>
 
@@ -719,23 +723,23 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="form_name">Name *</label>
-                            <input type="text" id="wizardName" name="name" required
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
+                            <input type="text" id="wizardName" name="name" required maxlength="200"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="form_email">Email *</label>
-                            <input type="email" id="wizardEmail" name="email" required
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
+                            <input type="email" id="wizardEmail" name="email" required maxlength="254"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="form_phone">Phone *</label>
-                            <input type="tel" id="wizardPhone" name="phone" required
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
+                            <input type="tel" id="wizardPhone" name="phone" required maxlength="30"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="wizard_address">Project Address *</label>
-                            <input type="text" id="wizardAddress" name="address" required
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
+                            <input type="text" id="wizardAddress" name="address" required maxlength="500"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
                         </div>
                         <div class="flex items-center">
                             <input type="checkbox" id="wizardIsOwner" name="is_owner" 
@@ -747,7 +751,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Service *</label>
                             <select id="wizardServiceId" name="service_id" required
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
                                 <option value="">Loading services...</option>
                             </select>
                             <input type="hidden" id="wizardServiceLocked" name="service_locked" value="0">

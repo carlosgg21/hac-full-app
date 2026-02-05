@@ -24,7 +24,7 @@ function renderQuestion(q) {
   const opts = q.options ? (Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]')) : []
   const req = q.is_required ? 'required' : ''
   const name = `q_${q.id}`
-  const inputFullClass = 'w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors'
+  const inputFullClass = 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors'
   const inputRadioClass = 'mt-1 flex-shrink-0 w-4 h-4 text-accent border-gray-300 rounded focus:ring-accent'
   const labelClass = 'flex items-start justify-start gap-3 p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer text-left'
 
@@ -74,6 +74,20 @@ function escapeHtml(s) {
   return d.innerHTML
 }
 
+// Max lengths for form fields (must match HTML maxlength / backend limits)
+const FIELD_MAX_LENGTHS = {
+  name: 200,
+  email: 254,
+  phone: 30,
+  address: 500
+}
+
+function isValidEmail(value) {
+  if (typeof value !== 'string' || !value.trim()) return false
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return value.length <= FIELD_MAX_LENGTHS.email && re.test(value.trim())
+}
+
 function buildMathReviewStepHtml(stepNum) {
   generateMathQuestion()
   return `
@@ -83,13 +97,13 @@ function buildMathReviewStepHtml(stepNum) {
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">Verification: What is ${wizardState.mathQuestion}? *</label>
         <input type="text" id="wizardMathAnswer" name="math_answer" required placeholder="Enter the result"
-               class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                data-math-question="${escapeHtml(wizardState.mathQuestion)}" data-math-expected="${wizardState.mathAnswer}">
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">Additional Notes (Optional)</label>
         <textarea id="wizardMessage" name="message" rows="4"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                   placeholder="Any additional information..."></textarea>
       </div>
       <div class="wizard-review-invoice text-left">
@@ -221,16 +235,55 @@ function updateReview() {
 
 const VALIDATION_ERROR_CLASSES = ['border-red-500', 'ring-2', 'ring-red-500']
 
+const VALIDATION_MESSAGES = {
+  en: {
+    required: 'This field is required.',
+    emailInvalid: 'Please enter a valid email address.',
+    maxLength: (max) => `Must be at most ${max} characters.`,
+    mathWrong: 'Please enter the correct result.'
+  },
+  fr: {
+    required: 'Ce champ est requis.',
+    emailInvalid: 'Veuillez entrer une adresse courriel valide.',
+    maxLength: (max) => `Maximum ${max} caractères.`,
+    mathWrong: 'Veuillez entrer le bon résultat.'
+  }
+}
+
+function validationMsg(key, ...args) {
+  const lang = (typeof currentLanguage !== 'undefined' && currentLanguage === 'fr') ? 'fr' : 'en'
+  const msg = VALIDATION_MESSAGES[lang][key]
+  return typeof msg === 'function' ? msg(...args) : msg
+}
+
+function getValidationMsgEl(inputEl) {
+  if (!inputEl || !inputEl.parentNode) return null
+  let msg = inputEl.parentNode.querySelector('.validation-error-msg')
+  if (!msg) {
+    msg = document.createElement('span')
+    msg.className = 'validation-error-msg'
+    msg.setAttribute('role', 'alert')
+    inputEl.parentNode.appendChild(msg)
+  }
+  return msg
+}
+
 function clearValidationErrors(container) {
   if (!container) return
   container.querySelectorAll('input, select, textarea').forEach(el => el.classList.remove(...VALIDATION_ERROR_CLASSES))
   container.querySelectorAll('.validation-error-group').forEach(el => el.classList.remove('validation-error-group'))
+  container.querySelectorAll('.validation-error-msg').forEach(el => { el.textContent = '' })
 }
 
-function markValidationError(el) {
+function markValidationError(el, message) {
   if (!el) return
   el.classList.add(...VALIDATION_ERROR_CLASSES)
-  setTimeout(() => el.classList.remove(...VALIDATION_ERROR_CLASSES), 4000)
+  const msgEl = getValidationMsgEl(el)
+  if (msgEl && message) msgEl.textContent = message
+  setTimeout(() => {
+    el.classList.remove(...VALIDATION_ERROR_CLASSES)
+    if (msgEl) msgEl.textContent = ''
+  }, 5000)
 }
 
 function markQuestionGroupError(container) {
@@ -253,23 +306,36 @@ function validateCurrentStep() {
   if (currentStep === 1) {
     let step1Ok = true
     const fields = [
-      { id: 'wizardName', required: true },
-      { id: 'wizardEmail', required: true },
-      { id: 'wizardPhone', required: true },
-      { id: 'wizardAddress', required: true },
+      { id: 'wizardName', required: true, maxLength: FIELD_MAX_LENGTHS.name },
+      { id: 'wizardEmail', required: true, maxLength: FIELD_MAX_LENGTHS.email, isEmail: true },
+      { id: 'wizardPhone', required: true, maxLength: FIELD_MAX_LENGTHS.phone },
+      { id: 'wizardAddress', required: true, maxLength: FIELD_MAX_LENGTHS.address },
       { id: 'wizardServiceId', required: true, isSelect: true },
       { id: 'wizardPrivacyPolicy', required: true, isCheckbox: true }
     ]
-    fields.forEach(({ id, required, isSelect, isCheckbox }) => {
-      if (!required) return
+    fields.forEach(({ id, required, isSelect, isCheckbox, maxLength, isEmail }) => {
+      if (!required && !maxLength && !isEmail) return
       const el = document.getElementById(id)
       if (!el) return
       let valid = false
+      let message = ''
       if (isCheckbox) valid = el.checked
       else if (isSelect) valid = !!el.value
-      else valid = !!String(el.value || '').trim()
+      else {
+        const val = String(el.value || '').trim()
+        valid = !!val
+        if (valid && isEmail && !isValidEmail(el.value)) {
+          message = validationMsg('emailInvalid')
+          markValidationError(el, message)
+          step1Ok = false
+        } else if (valid && maxLength && val.length > maxLength) {
+          message = validationMsg('maxLength', maxLength)
+          markValidationError(el, message)
+          step1Ok = false
+        }
+      }
       if (!valid) {
-        markValidationError(el)
+        markValidationError(el, validationMsg('required'))
         step1Ok = false
       }
     })
@@ -289,16 +355,20 @@ function validateCurrentStep() {
       const group = content.querySelectorAll(`input[name="${f.name}"][required]`)
       if (!Array.from(group).some(r => r.checked)) {
         const qContainer = f.closest('[data-question-id]')
-        if (qContainer) markQuestionGroupError(qContainer)
+        if (qContainer) {
+          markQuestionGroupError(qContainer)
+          const firstRadio = content.querySelector(`input[name="${f.name}"]`)
+          if (firstRadio) markValidationError(firstRadio, validationMsg('required'))
+        }
         questionsOk = false
       }
     } else if (f.type === 'checkbox') {
       if (f.required && !f.checked) {
-        markValidationError(f)
+        markValidationError(f, validationMsg('required'))
         questionsOk = false
       }
     } else if (!String(f.value || '').trim()) {
-      markValidationError(f)
+      markValidationError(f, validationMsg('required'))
       questionsOk = false
     }
   })
@@ -312,7 +382,7 @@ function validateCurrentStep() {
     if (mathInput) {
       const expected = mathInput.getAttribute('data-math-expected')
       if (mathInput.value.trim() !== expected) {
-        markValidationError(mathInput)
+        markValidationError(mathInput, validationMsg('mathWrong'))
         scrollToFirstInvalid(content)
         return false
       }
