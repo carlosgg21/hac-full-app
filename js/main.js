@@ -186,45 +186,12 @@ function updateElement(id, value, suffix = '', isPercentage = false) {
 }
 
 /**
- * Load services from API and populate wizard selects (Project from Portfolio, Project Type).
+ * Load services from API. Wizard service select is populated by wizard.js when opened.
  * Our Services section keeps the 6 static cards from index.html.
  */
 async function loadServicesFromAPI() {
-  const wizardPortfolioSelect = document.getElementById('wizardPortfolioProject')
-  const wizardProjectTypeSelect = document.getElementById('wizardProjectType')
-
   try {
-    const services = await API.getServices()
-    if (!services || !Array.isArray(services)) return
-
-    // Populate "Project from Portfolio" select in wizard with API services
-    if (wizardPortfolioSelect) {
-      const firstOpt = wizardPortfolioSelect.querySelector('option[value=""]')
-      wizardPortfolioSelect.innerHTML = ''
-      const placeholder = document.createElement('option')
-      placeholder.value = ''
-      placeholder.textContent = firstOpt ? firstOpt.textContent : 'Select a project...'
-      wizardPortfolioSelect.appendChild(placeholder)
-      services.forEach(s => {
-        const opt = document.createElement('option')
-        opt.value = s.name
-        opt.textContent = s.name
-        wizardPortfolioSelect.appendChild(opt)
-      })
-    }
-
-    // Optionally add API services to "Project Type" select (keep existing options, add missing from API)
-    if (wizardProjectTypeSelect) {
-      const existingValues = new Set(Array.from(wizardProjectTypeSelect.querySelectorAll('option')).map(o => o.value))
-      services.forEach(s => {
-        if (existingValues.has(s.name)) return
-        existingValues.add(s.name)
-        const opt = document.createElement('option')
-        opt.value = s.name
-        opt.textContent = s.name
-        wizardProjectTypeSelect.insertBefore(opt, wizardProjectTypeSelect.options[1] || null)
-      })
-    }
+    await API.getServices()
   } catch (err) {
     console.error('Error loading services from API:', err)
   }

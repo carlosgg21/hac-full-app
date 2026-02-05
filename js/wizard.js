@@ -1,570 +1,476 @@
-let currentStep = 1
-const totalSteps = 4
+/**
+ * Wizard - Dynamic quote form with questions from API
+ * Step 1: Basic info + Service select (from API)
+ * Steps 2-N: Questions by form_position (from API) or Math+Review if no questions
+ * Last step: Math verification + Review + Submit
+ */
 
-// Wizard DOM elements
+let currentStep = 1
+let totalSteps = 2
+let wizardState = {
+  questions: [],
+  serviceId: null,
+  serviceLocked: false,
+  mathQuestion: '',
+  mathAnswer: ''
+}
+
 let quoteWizardModal, openQuoteWizardBtn, closeWizardBtn, quoteWizardForm
 let wizardNextBtn, wizardPrevBtn, wizardSubmitBtn
+let wizardStepsContainer
 
-// Check if current project is Bathroom Remodel
-function isBathroomProject() {
-  const portfolioProject = document.getElementById("wizardPortfolioProject")?.value
-  const projectType = document.getElementById("wizardProjectType")?.value
-  return portfolioProject === "Bathroom Remodel" || projectType === "Bathroom"
+// Build HTML for a single question
+function renderQuestion(q) {
+  const opts = q.options ? (Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]')) : []
+  const req = q.is_required ? 'required' : ''
+  const name = `q_${q.id}`
+  const inputFullClass = 'w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors'
+  const inputRadioClass = 'mt-1 flex-shrink-0 w-4 h-4 text-accent border-gray-300 rounded focus:ring-accent'
+  const labelClass = 'flex items-start justify-start gap-3 p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer text-left'
+
+  let html = `<div class="mb-6 text-left" data-question-id="${q.id}"><label class="block text-sm font-medium text-gray-700 mb-3">${escapeHtml(q.question_text)}${q.is_required ? ' *' : ''}</label>`
+
+  switch (q.question_type) {
+    case 'radio':
+      html += '<div class="space-y-2">'
+      opts.forEach((opt) => {
+        const val = typeof opt === 'object' ? opt.text : opt
+        html += `<label class="${labelClass}"><input type="radio" name="${name}" value="${escapeHtml(val)}" ${req} class="${inputRadioClass}"><span class="flex-1 text-left">${escapeHtml(val)}</span></label>`
+      })
+      html += '</div>'
+      break
+    case 'checkbox':
+      html += '<div class="space-y-2">'
+      opts.forEach((opt) => {
+        const val = typeof opt === 'object' ? opt.text : opt
+        html += `<label class="${labelClass}"><input type="checkbox" name="${name}" value="${escapeHtml(val)}" class="${inputRadioClass}"><span class="flex-1 text-left">${escapeHtml(val)}</span></label>`
+      })
+      html += '</div>'
+      break
+    case 'select':
+      html += `<select name="${name}" ${req} class="${inputFullClass}"><option value="">Select...</option>`
+      opts.forEach((opt) => {
+        const val = typeof opt === 'object' ? opt.text : opt
+        html += `<option value="${escapeHtml(val)}">${escapeHtml(val)}</option>`
+      })
+      html += '</select>'
+      break
+    case 'number':
+      html += `<input type="number" name="${name}" ${req} class="${inputFullClass}" min="0" placeholder="">`
+      break
+    case 'textarea':
+      html += `<textarea name="${name}" ${req} class="${inputFullClass}" rows="4"></textarea>`
+      break
+    default:
+      html += `<input type="text" name="${name}" ${req} class="${inputFullClass}">`
+  }
+  html += '</div>'
+  return html
 }
 
-// Check if current project is Kitchen Renovation
-function isKitchenProject() {
-  const portfolioProject = document.getElementById("wizardPortfolioProject")?.value
-  const projectType = document.getElementById("wizardProjectType")?.value
-  return portfolioProject === "Kitchen Renovation" || projectType === "Kitchen"
+function escapeHtml(s) {
+  const d = document.createElement('div')
+  d.textContent = s
+  return d.innerHTML
 }
 
-// Calculate bathroom category based on answers
-function calculateBathroomCategory() {
-  const answers = {
-    goal: document.querySelector('input[name="bathroom_goal"]:checked')?.getAttribute("data-category"),
-    layout: document.querySelector('input[name="bathroom_layout"]:checked')?.getAttribute("data-category"),
-    shower_tub: document.querySelector('input[name="bathroom_shower_tub"]:checked')?.getAttribute("data-category"),
-    finishes: document.querySelector('input[name="bathroom_finishes"]:checked')?.getAttribute("data-category"),
-    vanity: document.querySelector('input[name="bathroom_vanity"]:checked')?.getAttribute("data-category"),
-    durability: document.querySelector('input[name="bathroom_durability"]:checked')?.getAttribute("data-category"),
-    budget: document.querySelector('input[name="bathroom_budget"]:checked')?.getAttribute("data-category")
-  }
+function buildMathReviewStepHtml(stepNum) {
+  generateMathQuestion()
+  return `
+  <div class="wizard-step-content wizard-step-dynamic hidden text-left" data-step="${stepNum}">
+    <h3 class="text-xl font-bold text-primary mb-6 text-left">Review & Submit</h3>
+    <div class="space-y-6 text-left">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Verification: What is ${wizardState.mathQuestion}? *</label>
+        <input type="text" id="wizardMathAnswer" name="math_answer" required placeholder="Enter the result"
+               class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+               data-math-question="${escapeHtml(wizardState.mathQuestion)}" data-math-expected="${wizardState.mathAnswer}">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Additional Notes (Optional)</label>
+        <textarea id="wizardMessage" name="message" rows="4"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  placeholder="Any additional information..."></textarea>
+      </div>
+      <div class="wizard-review-invoice text-left">
+        <div class="border border-gray-200 rounded-t-lg bg-primary text-white px-4 py-3">
+          <h4 class="font-semibold text-lg" data-translate="wizard_review_title">Review Your Information</h4>
+        </div>
+        <div id="wizardReview" class="border border-t-0 border-gray-200 rounded-b-lg overflow-hidden"></div>
+      </div>
+    </div>
+  </div>`
+}
 
-  // Count upgrades
-  const upgrades = document.querySelectorAll('input[name="bathroom_upgrades"]:checked')
-  let upgradesCategory = "basic"
-  if (upgrades.length === 0) {
-    upgradesCategory = "basic"
-  } else if (upgrades.length <= 2) {
-    upgradesCategory = "mid-range"
-  } else {
-    upgradesCategory = "high-end"
-  }
+// Generate math question (e.g. 3 + 5 = 8)
+function generateMathQuestion() {
+  const a = Math.floor(Math.random() * 9) + 1
+  const b = Math.floor(Math.random() * 9) + 1
+  wizardState.mathQuestion = `${a} + ${b}`
+  wizardState.mathAnswer = String(a + b)
+}
 
-  // Map categories to points
-  const categoryPoints = { "basic": 1, "mid-range": 2, "high-end": 3 }
-  let totalPoints = 0
-  let count = 0
+// Build dynamic steps from questions
+async function loadQuestionsAndBuildSteps(serviceId) {
+  const container = document.getElementById('wizardDynamicSteps')
+  if (!container) return
 
-  Object.values(answers).forEach(category => {
-    if (category) {
-      totalPoints += categoryPoints[category] || 0
-      count++
+  container.innerHTML = '<p class="text-gray-500 py-4">Loading...</p>'
+
+  try {
+    const questions = typeof API !== 'undefined' && API.getQuestions
+      ? await API.getQuestions(serviceId)
+      : []
+
+    wizardState.questions = questions || []
+
+    const byPosition = {}
+    ;(questions || []).forEach(q => {
+      const pos = parseInt(q.form_position) || 2
+      if (!byPosition[pos]) byPosition[pos] = []
+      byPosition[pos].push(q)
+    })
+
+    const positions = Object.keys(byPosition).map(Number).sort((a, b) => a - b)
+    const stepsHtml = []
+    let stepNum = 2
+
+    // If no questions: only math + review step (step 2)
+    if (positions.length === 0) {
+      container.innerHTML = buildMathReviewStepHtml(2)
+      totalSteps = 2
+      rebuildStepIndicators()
+      updateWizardSteps()
+      return
     }
-  })
 
-  // Add upgrades points
-  totalPoints += categoryPoints[upgradesCategory] || 0
-  count++
+    positions.forEach(pos => {
+      const qs = byPosition[pos]
+      const title = positions.length > 1 ? `Step ${stepNum}` : 'Project Details'
+      let stepHtml = `<div class="wizard-step-content wizard-step-dynamic hidden text-left" data-step="${stepNum}"><h3 class="text-xl font-bold text-primary mb-6 text-left">${title}</h3><div class="space-y-6 text-left">`
+      qs.forEach(q => { stepHtml += renderQuestion(q) })
+      stepHtml += '</div></div>'
+      stepsHtml.push(stepHtml)
+      stepNum++
+    })
 
-  if (count === 0) return "Basic"
-
-  const average = totalPoints / count
-
-  if (average < 1.5) return "Basic"
-  if (average <= 2.5) return "Mid-Range"
-  return "High-End"
+    const lastStep = stepNum
+    const reviewHtml = buildMathReviewStepHtml(lastStep)
+    container.innerHTML = stepsHtml.join('') + reviewHtml
+    totalSteps = lastStep
+    rebuildStepIndicators()
+    updateWizardSteps()
+  } catch (err) {
+    console.error('Error loading questions:', err)
+    container.innerHTML = '<p class="text-red-500 py-4">Error loading questions. Please try again.</p>'
+    totalSteps = 2
+    rebuildStepIndicators()
+  }
 }
 
-// Calculate kitchen category based on answers
-function calculateKitchenCategory() {
-  const answers = {
-    goal: document.querySelector('input[name="kitchen_goal"]:checked')?.getAttribute("data-category"),
-    layout: document.querySelector('input[name="kitchen_layout"]:checked')?.getAttribute("data-category"),
-    cabinetry: document.querySelector('input[name="kitchen_cabinetry"]:checked')?.getAttribute("data-category"),
-    finishes: document.querySelector('input[name="kitchen_finishes"]:checked')?.getAttribute("data-category"),
-    countertop: document.querySelector('input[name="kitchen_countertop"]:checked')?.getAttribute("data-category"),
-    appliances: document.querySelector('input[name="kitchen_appliances"]:checked')?.getAttribute("data-category"),
-    durability: document.querySelector('input[name="kitchen_durability"]:checked')?.getAttribute("data-category"),
-    budget: document.querySelector('input[name="kitchen_budget"]:checked')?.getAttribute("data-category")
+// Rebuild step indicator dots
+function rebuildStepIndicators() {
+  const container = document.querySelector('.wizard-steps')
+  if (!container) return
+  let html = '<div class="wizard-step active" data-step="1"><div class="wizard-step-number">1</div><div class="wizard-step-label">Basic Info</div></div>'
+  for (let i = 2; i <= totalSteps; i++) {
+    const label = i === totalSteps ? 'Review' : `Step ${i}`
+    html += `<div class="wizard-step" data-step="${i}"><div class="wizard-step-number">${i}</div><div class="wizard-step-label">${label}</div></div>`
   }
-
-  // Count upgrades
-  const upgrades = document.querySelectorAll('input[name="kitchen_upgrades"]:checked')
-  let upgradesCategory = "basic"
-  if (upgrades.length === 0) {
-    upgradesCategory = "basic"
-  } else if (upgrades.length <= 2) {
-    upgradesCategory = "mid-range"
-  } else {
-    upgradesCategory = "high-end"
-  }
-
-  // Map categories to points
-  const categoryPoints = { "basic": 1, "mid-range": 2, "high-end": 3 }
-  let totalPoints = 0
-  let count = 0
-
-  Object.values(answers).forEach(category => {
-    if (category) {
-      totalPoints += categoryPoints[category] || 0
-      count++
-    }
-  })
-
-  // Add upgrades points
-  totalPoints += categoryPoints[upgradesCategory] || 0
-  count++
-
-  if (count === 0) return "Basic"
-
-  const average = totalPoints / count
-
-  if (average < 1.5) return "Basic"
-  if (average <= 2.5) return "Mid-Range"
-  return "High-End"
+  container.innerHTML = html
 }
 
-// Update review section
 function updateReview() {
-  const isBathroom = isBathroomProject()
-  const isKitchen = isKitchenProject()
-  const formData = new FormData(quoteWizardForm)
-  
-  if (isBathroom) {
-    const reviewDiv = document.getElementById("wizardReviewBathroom")
-    const categoryDiv = document.getElementById("bathroomCategoryValue")
-    const category = calculateBathroomCategory()
-    
-    const bathroomAnswers = {
-      goal: document.querySelector('input[name="bathroom_goal"]:checked')?.closest("label")?.textContent.trim() || "Not answered",
-      layout: document.querySelector('input[name="bathroom_layout"]:checked')?.closest("label")?.textContent.trim() || "Not answered",
-      shower_tub: document.querySelector('input[name="bathroom_shower_tub"]:checked')?.closest("label")?.textContent.trim() || "Not answered",
-      finishes: document.querySelector('input[name="bathroom_finishes"]:checked')?.closest("label")?.textContent.trim() || "Not answered",
-      vanity: document.querySelector('input[name="bathroom_vanity"]:checked')?.closest("label")?.textContent.trim() || "Not answered",
-      durability: document.querySelector('input[name="bathroom_durability"]:checked')?.closest("label")?.textContent.trim() || "Not answered",
-      budget: document.querySelector('input[name="bathroom_budget"]:checked')?.closest("label")?.textContent.trim() || "Not answered"
-    }
+  const div = document.getElementById('wizardReview')
+  if (!div || !quoteWizardForm) return
+  const fd = new FormData(quoteWizardForm)
+  const serviceSelect = document.getElementById('wizardServiceId')
+  const serviceName = serviceSelect?.options[serviceSelect.selectedIndex]?.textContent || '-'
 
-    const upgrades = Array.from(document.querySelectorAll('input[name="bathroom_upgrades"]:checked'))
-      .map(checkbox => checkbox.closest("label")?.textContent.trim())
-      .filter(Boolean)
-
-    if (reviewDiv) {
-      reviewDiv.innerHTML = `
-        <p><strong>Name:</strong> ${formData.get("name") || "Not provided"}</p>
-        <p><strong>Email:</strong> ${formData.get("email") || "Not provided"}</p>
-        <p><strong>Phone:</strong> ${formData.get("phone") || "Not provided"}</p>
-        <p><strong>Address:</strong> ${formData.get("address") || "Not provided"}</p>
-        <p><strong>Property Owner:</strong> ${formData.get("is_owner") ? "Yes" : "No"}</p>
-        <hr class="my-2">
-        <p><strong>1. Main Goal:</strong> ${bathroomAnswers.goal}</p>
-        <p><strong>2. Layout:</strong> ${bathroomAnswers.layout}</p>
-        <p><strong>3. Shower/Tub:</strong> ${bathroomAnswers.shower_tub}</p>
-        <p><strong>4. Finishes:</strong> ${bathroomAnswers.finishes}</p>
-        <p><strong>5. Vanity:</strong> ${bathroomAnswers.vanity}</p>
-        <p><strong>6. Upgrades:</strong> ${upgrades.length > 0 ? upgrades.join(", ") : "None"}</p>
-        <p><strong>7. Durability:</strong> ${bathroomAnswers.durability}</p>
-        <p><strong>8. Budget:</strong> ${bathroomAnswers.budget}</p>
-        ${formData.get("message") ? `<p><strong>Notes:</strong> ${formData.get("message")}</p>` : ""}
-      `
-    }
-    
-    if (categoryDiv) {
-      categoryDiv.textContent = category
-    }
-  } else if (isKitchen) {
-    const reviewDiv = document.getElementById("wizardReviewKitchen")
-    const categoryDiv = document.getElementById("kitchenCategoryValue")
-    const category = calculateKitchenCategory()
-    
-    const kitchenAnswers = {
-      goal: document.querySelector('input[name="kitchen_goal"]:checked')?.closest("label")?.textContent.trim() || "Not answered",
-      layout: document.querySelector('input[name="kitchen_layout"]:checked')?.closest("label")?.textContent.trim() || "Not answered",
-      cabinetry: document.querySelector('input[name="kitchen_cabinetry"]:checked')?.closest("label")?.textContent.trim() || "Not answered",
-      finishes: document.querySelector('input[name="kitchen_finishes"]:checked')?.closest("label")?.textContent.trim() || "Not answered",
-      countertop: document.querySelector('input[name="kitchen_countertop"]:checked')?.closest("label")?.textContent.trim() || "Not answered",
-      appliances: document.querySelector('input[name="kitchen_appliances"]:checked')?.closest("label")?.textContent.trim() || "Not answered",
-      durability: document.querySelector('input[name="kitchen_durability"]:checked')?.closest("label")?.textContent.trim() || "Not answered",
-      budget: document.querySelector('input[name="kitchen_budget"]:checked')?.closest("label")?.textContent.trim() || "Not answered"
-    }
-
-    const upgrades = Array.from(document.querySelectorAll('input[name="kitchen_upgrades"]:checked'))
-      .map(checkbox => checkbox.closest("label")?.textContent.trim())
-      .filter(Boolean)
-
-    if (reviewDiv) {
-      reviewDiv.innerHTML = `
-        <p><strong>Name:</strong> ${formData.get("name") || "Not provided"}</p>
-        <p><strong>Email:</strong> ${formData.get("email") || "Not provided"}</p>
-        <p><strong>Phone:</strong> ${formData.get("phone") || "Not provided"}</p>
-        <p><strong>Address:</strong> ${formData.get("address") || "Not provided"}</p>
-        <p><strong>Property Owner:</strong> ${formData.get("is_owner") ? "Yes" : "No"}</p>
-        <hr class="my-2">
-        <p><strong>1. Main Goal:</strong> ${kitchenAnswers.goal}</p>
-        <p><strong>2. Layout:</strong> ${kitchenAnswers.layout}</p>
-        <p><strong>3. Cabinetry:</strong> ${kitchenAnswers.cabinetry}</p>
-        <p><strong>4. Finishes:</strong> ${kitchenAnswers.finishes}</p>
-        <p><strong>5. Countertop:</strong> ${kitchenAnswers.countertop}</p>
-        <p><strong>6. Upgrades:</strong> ${upgrades.length > 0 ? upgrades.join(", ") : "None"}</p>
-        <p><strong>7. Appliances:</strong> ${kitchenAnswers.appliances}</p>
-        <p><strong>8. Durability:</strong> ${kitchenAnswers.durability}</p>
-        <p><strong>9. Budget:</strong> ${kitchenAnswers.budget}</p>
-        ${formData.get("message") ? `<p><strong>Notes:</strong> ${formData.get("message")}</p>` : ""}
-      `
-    }
-    
-    if (categoryDiv) {
-      categoryDiv.textContent = category
-    }
-  } else {
-    const reviewDiv = document.getElementById("wizardReview")
-    
-    if (reviewDiv) {
-      const reviewData = {
-        name: formData.get("name") || "Not provided",
-        email: formData.get("email") || "Not provided",
-        phone: formData.get("phone") || "Not provided",
-        address: formData.get("address") || "Not provided",
-        is_owner: formData.get("is_owner") ? "Yes" : "No",
-        portfolio_project: formData.get("portfolio_project") || "Not provided",
-        project_type: formData.get("project_type") || "Not provided",
-        property_type: formData.get("property_type") || "Not provided",
-        square_feet: formData.get("square_feet") || "Not provided",
-        budget: formData.get("budget") || "Not provided",
-        timeline: formData.get("timeline") || "Not provided",
-        preferred_contact: formData.get("preferred_contact") || "Not provided",
-        message: formData.get("message") || "None"
-      }
-
-      reviewDiv.innerHTML = `
-        <p><strong>Name:</strong> ${reviewData.name}</p>
-        <p><strong>Email:</strong> ${reviewData.email}</p>
-        <p><strong>Phone:</strong> ${reviewData.phone}</p>
-        <p><strong>Address:</strong> ${reviewData.address}</p>
-        <p><strong>Property Owner:</strong> ${reviewData.is_owner}</p>
-        <p><strong>Project from Portfolio:</strong> ${reviewData.portfolio_project}</p>
-        <p><strong>Project Type:</strong> ${reviewData.project_type}</p>
-        <p><strong>Property Type:</strong> ${reviewData.property_type}</p>
-        <p><strong>Square Feet:</strong> ${reviewData.square_feet}</p>
-        <p><strong>Budget:</strong> ${reviewData.budget}</p>
-        <p><strong>Timeline:</strong> ${reviewData.timeline}</p>
-        <p><strong>Preferred Contact:</strong> ${reviewData.preferred_contact}</p>
-        ${reviewData.message !== "None" ? `<p><strong>Notes:</strong> ${reviewData.message}</p>` : ""}
-      `
-    }
-  }
+  // Section 1: Client / quote info (invoice-style block)
+  const clientLabels = typeof translations !== 'undefined' && translations.wizard_review_name
+    ? { name: translations.wizard_review_name, email: translations.wizard_review_email, phone: translations.wizard_review_phone, address: translations.wizard_review_address, service: translations.wizard_review_service, owner: translations.wizard_review_owner }
+    : { name: 'Name', email: 'Email', phone: 'Phone', address: 'Address', service: 'Service', owner: 'Property Owner' }
+  let html = `
+    <div class="bg-gray-50 px-4 py-4 border-b border-gray-200">
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Customer &amp; quote details</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+        <div class="flex"><span class="text-gray-500 w-28 flex-shrink-0">${escapeHtml(clientLabels.name)}</span><span class="text-gray-900 font-medium">${escapeHtml(String(fd.get('name') || '-'))}</span></div>
+        <div class="flex"><span class="text-gray-500 w-28 flex-shrink-0">${escapeHtml(clientLabels.email)}</span><span class="text-gray-900 font-medium">${escapeHtml(String(fd.get('email') || '-'))}</span></div>
+        <div class="flex"><span class="text-gray-500 w-28 flex-shrink-0">${escapeHtml(clientLabels.phone)}</span><span class="text-gray-900">${escapeHtml(String(fd.get('phone') || '-'))}</span></div>
+        <div class="flex sm:col-span-2"><span class="text-gray-500 w-28 flex-shrink-0">${escapeHtml(clientLabels.address)}</span><span class="text-gray-900">${escapeHtml(String(fd.get('address') || '-'))}</span></div>
+        <div class="flex"><span class="text-gray-500 w-28 flex-shrink-0">${escapeHtml(clientLabels.service)}</span><span class="text-gray-900 font-medium">${escapeHtml(String(serviceName))}</span></div>
+        <div class="flex"><span class="text-gray-500 w-28 flex-shrink-0">${escapeHtml(clientLabels.owner)}</span><span class="text-gray-900">${fd.get('is_owner') ? 'Yes' : 'No'}</span></div>
+      </div>
+    </div>
+    <div class="px-4 py-3">
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Project details — questions &amp; answers</div>
+      <table class="w-full text-sm border-collapse">
+        <thead><tr class="border-b border-gray-200"><th class="text-left py-2 pr-4 text-gray-500 font-semibold">Question</th><th class="text-left py-2 text-gray-500 font-semibold">Answer</th></tr></thead>
+        <tbody>`
+  wizardState.questions.forEach(q => {
+    const name = `q_${q.id}`
+    const val = q.question_type === 'checkbox'
+      ? Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(c => c.value).join(', ') || '—'
+      : (document.querySelector(`[name="${name}"]`)?.value || '—')
+    html += `<tr class="border-b border-gray-100"><td class="py-2 pr-4 text-gray-700 align-top">${escapeHtml(q.question_text)}</td><td class="py-2 text-gray-900 align-top">${escapeHtml(String(val))}</td></tr>`
+  })
+  html += `</tbody></table></div>`
+  div.innerHTML = html
 }
 
-// Validate current step
+const VALIDATION_ERROR_CLASSES = ['border-red-500', 'ring-2', 'ring-red-500']
+
+function clearValidationErrors(container) {
+  if (!container) return
+  container.querySelectorAll('input, select, textarea').forEach(el => el.classList.remove(...VALIDATION_ERROR_CLASSES))
+  container.querySelectorAll('.validation-error-group').forEach(el => el.classList.remove('validation-error-group'))
+}
+
+function markValidationError(el) {
+  if (!el) return
+  el.classList.add(...VALIDATION_ERROR_CLASSES)
+  setTimeout(() => el.classList.remove(...VALIDATION_ERROR_CLASSES), 4000)
+}
+
+function markQuestionGroupError(container) {
+  if (!container) return
+  container.classList.add('validation-error-group')
+  setTimeout(() => container.classList.remove('validation-error-group'), 4000)
+}
+
+function scrollToFirstInvalid(content) {
+  const firstError = content.querySelector('.border-red-500, .validation-error-group')
+  if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
+
 function validateCurrentStep() {
-  const currentStepContent = document.querySelector(`.wizard-step-content[data-step="${currentStep}"].active`)
-  if (!currentStepContent) return false
-  
-  const requiredFields = currentStepContent.querySelectorAll("input[required], select[required]")
-  let isValid = true
+  const content = document.querySelector(`.wizard-step-content[data-step="${currentStep}"].active`)
+  if (!content) return false
 
-  // Special validation for Step 1 - privacy policy checkbox
+  clearValidationErrors(content)
+
   if (currentStep === 1) {
-    const privacyCheckbox = document.getElementById("wizardPrivacyPolicy")
-    if (privacyCheckbox && !privacyCheckbox.checked) {
-      isValid = false
-      privacyCheckbox.classList.add("border-red-500", "ring-2", "ring-red-500")
-      setTimeout(() => {
-        privacyCheckbox.classList.remove("border-red-500", "ring-2", "ring-red-500")
-      }, 3000)
+    let step1Ok = true
+    const fields = [
+      { id: 'wizardName', required: true },
+      { id: 'wizardEmail', required: true },
+      { id: 'wizardPhone', required: true },
+      { id: 'wizardAddress', required: true },
+      { id: 'wizardServiceId', required: true, isSelect: true },
+      { id: 'wizardPrivacyPolicy', required: true, isCheckbox: true }
+    ]
+    fields.forEach(({ id, required, isSelect, isCheckbox }) => {
+      if (!required) return
+      const el = document.getElementById(id)
+      if (!el) return
+      let valid = false
+      if (isCheckbox) valid = el.checked
+      else if (isSelect) valid = !!el.value
+      else valid = !!String(el.value || '').trim()
+      if (!valid) {
+        markValidationError(el)
+        step1Ok = false
+      }
+    })
+    if (!step1Ok) {
+      scrollToFirstInvalid(content)
+      return false
     }
   }
 
-  requiredFields.forEach((field) => {
-    if (field.type === "checkbox") {
-      if (!field.checked && field.required) {
-        isValid = false
-        field.classList.add("border-red-500", "ring-2", "ring-red-500")
-        setTimeout(() => {
-          field.classList.remove("border-red-500", "ring-2", "ring-red-500")
-        }, 3000)
+  const required = content.querySelectorAll('input[required], select[required]')
+  let questionsOk = true
+  const radioGroupsChecked = new Set()
+  required.forEach(f => {
+    if (f.type === 'radio') {
+      if (radioGroupsChecked.has(f.name)) return
+      radioGroupsChecked.add(f.name)
+      const group = content.querySelectorAll(`input[name="${f.name}"][required]`)
+      if (!Array.from(group).some(r => r.checked)) {
+        const qContainer = f.closest('[data-question-id]')
+        if (qContainer) markQuestionGroupError(qContainer)
+        questionsOk = false
       }
-    } else if (field.type === "radio") {
-      const radioGroup = currentStepContent.querySelectorAll(`input[name="${field.name}"][required]`)
-      const isRadioChecked = Array.from(radioGroup).some(radio => radio.checked)
-      if (!isRadioChecked) {
-        isValid = false
-        radioGroup.forEach(radio => {
-          radio.closest("label")?.classList.add("border-red-500")
-          setTimeout(() => {
-            radio.closest("label")?.classList.remove("border-red-500")
-          }, 3000)
-        })
+    } else if (f.type === 'checkbox') {
+      if (f.required && !f.checked) {
+        markValidationError(f)
+        questionsOk = false
       }
-    } else if (!field.value.trim()) {
-      isValid = false
-      field.classList.add("border-red-500")
-      setTimeout(() => {
-        field.classList.remove("border-red-500")
-      }, 3000)
-    } else {
-      field.classList.remove("border-red-500")
+    } else if (!String(f.value || '').trim()) {
+      markValidationError(f)
+      questionsOk = false
     }
   })
+  if (!questionsOk) {
+    scrollToFirstInvalid(content)
+    return false
+  }
 
-  return isValid
+  if (currentStep === totalSteps) {
+    const mathInput = document.getElementById('wizardMathAnswer')
+    if (mathInput) {
+      const expected = mathInput.getAttribute('data-math-expected')
+      if (mathInput.value.trim() !== expected) {
+        markValidationError(mathInput)
+        scrollToFirstInvalid(content)
+        return false
+      }
+    }
+  }
+  return true
 }
 
-// Update wizard step indicators
 function updateWizardSteps() {
-  const isBathroom = isBathroomProject()
-  const isKitchen = isKitchenProject()
-  
-  // Show/hide step groups based on project type
-  const defaultSteps = document.querySelectorAll(".wizard-step-default")
-  const bathroomSteps = document.querySelectorAll(".wizard-step-bathroom")
-  const kitchenSteps = document.querySelectorAll(".wizard-step-kitchen")
+  document.querySelectorAll('.wizard-step').forEach((el, i) => {
+    const n = i + 1
+    el.classList.remove('active', 'completed')
+    if (n < currentStep) el.classList.add('completed')
+    else if (n === currentStep) el.classList.add('active')
+  })
 
-  if (isBathroom) {
-    defaultSteps.forEach(step => step.classList.add("hidden"))
-    bathroomSteps.forEach(step => step.classList.remove("hidden"))
-    kitchenSteps.forEach(step => step.classList.add("hidden"))
-    
-    // Remove required attribute from default and kitchen form fields when hidden
-    const defaultRequiredFields = document.querySelectorAll(".wizard-step-default [required], .wizard-step-kitchen [required]")
-    defaultRequiredFields.forEach(field => {
-      field.removeAttribute("required")
-      field.setAttribute("data-was-required", "true")
-    })
-  } else if (isKitchen) {
-    defaultSteps.forEach(step => step.classList.add("hidden"))
-    bathroomSteps.forEach(step => step.classList.add("hidden"))
-    kitchenSteps.forEach(step => step.classList.remove("hidden"))
-    
-    // Remove required attribute from default and bathroom form fields when hidden
-    const defaultRequiredFields = document.querySelectorAll(".wizard-step-default [required], .wizard-step-bathroom [required]")
-    defaultRequiredFields.forEach(field => {
-      field.removeAttribute("required")
-      field.setAttribute("data-was-required", "true")
-    })
-  } else {
-    defaultSteps.forEach(step => step.classList.remove("hidden"))
-    bathroomSteps.forEach(step => step.classList.add("hidden"))
-    kitchenSteps.forEach(step => step.classList.add("hidden"))
-    
-    // Restore required attribute for default form fields when visible
-    const defaultFields = document.querySelectorAll(".wizard-step-default [data-was-required]")
-    defaultFields.forEach(field => {
-      field.setAttribute("required", "required")
-    })
-    
-    // Remove required attribute from bathroom and kitchen form fields when hidden
-    const specialRequiredFields = document.querySelectorAll(".wizard-step-bathroom [required], .wizard-step-kitchen [required]")
-    specialRequiredFields.forEach(field => {
-      field.removeAttribute("required")
-      field.setAttribute("data-was-required", "true")
-    })
-  }
-
-  // Update step indicators
-  document.querySelectorAll(".wizard-step").forEach((step, index) => {
-    const stepNum = index + 1
-    step.classList.remove("active", "completed")
-    if (stepNum < currentStep) {
-      step.classList.add("completed")
-    } else if (stepNum === currentStep) {
-      step.classList.add("active")
+  document.querySelectorAll('.wizard-step-content').forEach(el => {
+    const n = parseInt(el.getAttribute('data-step'))
+    el.classList.remove('active')
+    el.classList.add('hidden')
+    if (n === currentStep) {
+      el.classList.add('active')
+      el.classList.remove('hidden')
     }
   })
 
-  // Update step content visibility - only show active step for current project type
-  document.querySelectorAll(".wizard-step-content").forEach((content) => {
-    const stepNum = parseInt(content.getAttribute("data-step"))
-    const isDefault = content.classList.contains("wizard-step-default")
-    const isBathroomStep = content.classList.contains("wizard-step-bathroom")
-    const isKitchenStep = content.classList.contains("wizard-step-kitchen")
-    const isStep1 = stepNum === 1
-    
-    // Remove active from all
-    content.classList.remove("active")
-    
-    // Step 1 is always visible (common for all project types)
-    if (isStep1) {
-      if (stepNum === currentStep) {
-        content.classList.add("active")
-        content.classList.remove("hidden")
-      } else {
-        content.classList.add("hidden")
+  if (wizardPrevBtn) wizardPrevBtn.classList.toggle('hidden', currentStep === 1)
+  if (wizardNextBtn) wizardNextBtn.classList.toggle('hidden', currentStep === totalSteps)
+  if (wizardSubmitBtn) wizardSubmitBtn.classList.toggle('hidden', currentStep !== totalSteps)
+
+  if (currentStep === totalSteps) updateReview()
+}
+
+async function loadServicesIntoSelect(lockServiceId = null) {
+  const sel = document.getElementById('wizardServiceId')
+  const lockedInput = document.getElementById('wizardServiceLocked')
+  if (!sel) return
+  sel.innerHTML = '<option value="">Loading...</option>'
+  try {
+    const services = typeof API !== 'undefined' && API.getServices ? await API.getServices() : []
+    sel.innerHTML = '<option value="">Select a service...</option>'
+    services.forEach(s => {
+      const opt = document.createElement('option')
+      opt.value = s.id
+      opt.textContent = s.name
+      if (lockServiceId != null) {
+        opt.disabled = s.id != lockServiceId
       }
+      sel.appendChild(opt)
+    })
+    if (lockServiceId != null) {
+      sel.value = String(lockServiceId)
+      sel.classList.add('service-locked')
+      if (lockedInput) lockedInput.value = '1'
     } else {
-      // Show only the active step that matches the project type
-      if (stepNum === currentStep) {
-        if ((isBathroom && isBathroomStep) || (isKitchen && isKitchenStep) || (!isBathroom && !isKitchen && isDefault)) {
-          content.classList.add("active")
-          content.classList.remove("hidden")
-        } else {
-          content.classList.add("hidden")
-        }
-      } else {
-        // Hide all other steps
-        content.classList.add("hidden")
-      }
+      sel.classList.remove('service-locked')
+      if (lockedInput) lockedInput.value = '0'
     }
-  })
+  } catch (e) {
+    sel.innerHTML = '<option value="">Error loading services</option>'
+  }
+}
 
-  // Update navigation buttons
-  if (wizardPrevBtn) {
-    wizardPrevBtn.classList.toggle("hidden", currentStep === 1)
-  }
-  if (wizardNextBtn) {
-    wizardNextBtn.classList.toggle("hidden", currentStep === totalSteps)
-  }
-  if (wizardSubmitBtn) {
-    wizardSubmitBtn.classList.toggle("hidden", currentStep !== totalSteps)
-  }
+async function openWizard(serviceId = null, lockService = false) {
+  currentStep = 1
+  quoteWizardModal?.classList.remove('hidden')
+  document.body.style.overflow = 'hidden'
+  wizardState.serviceLocked = lockService
+  wizardState.serviceId = serviceId
 
-  // Update review on step 4
-  if (currentStep === 4) {
-    updateReview()
+  await loadServicesIntoSelect(lockService ? serviceId : null)
+
+  const sid = serviceId || parseInt(document.getElementById('wizardServiceId')?.value || '0')
+  if (sid) await loadQuestionsAndBuildSteps(sid)
+  else {
+    totalSteps = 2
+    rebuildStepIndicators()
+    document.getElementById('wizardDynamicSteps').innerHTML = '<p class="text-gray-500 py-4">Select a service to continue.</p>'
+    updateWizardSteps()
   }
 }
 
 function closeWizard() {
-  if (quoteWizardModal) {
-    quoteWizardModal.classList.add("hidden")
-  }
-  document.body.style.overflow = ""
+  quoteWizardModal?.classList.add('hidden')
+  document.body.style.overflow = ''
   currentStep = 1
-  
-  // Restore all required attributes to their original state
-  const allFields = document.querySelectorAll("[data-was-required]")
-  allFields.forEach(field => {
-    field.setAttribute("required", "required")
-    field.removeAttribute("data-was-required")
-  })
-  
+  const sel = document.getElementById('wizardServiceId')
+  if (sel) sel.classList.remove('service-locked')
+  const locked = document.getElementById('wizardServiceLocked')
+  if (locked) locked.value = '0'
   updateWizardSteps()
 }
 
-// Initialize wizard
 function initWizard() {
-  // Get wizard DOM elements
-  quoteWizardModal = document.getElementById("quoteWizardModal")
-  openQuoteWizardBtn = document.getElementById("openQuoteWizardBtn")
-  closeWizardBtn = document.getElementById("closeWizardBtn")
-  quoteWizardForm = document.getElementById("quoteWizardForm")
-  wizardNextBtn = document.getElementById("wizardNextBtn")
-  wizardPrevBtn = document.getElementById("wizardPrevBtn")
-  wizardSubmitBtn = document.getElementById("wizardSubmitBtn")
+  quoteWizardModal = document.getElementById('quoteWizardModal')
+  openQuoteWizardBtn = document.getElementById('openQuoteWizardBtn')
+  closeWizardBtn = document.getElementById('closeWizardBtn')
+  quoteWizardForm = document.getElementById('quoteWizardForm')
+  wizardNextBtn = document.getElementById('wizardNextBtn')
+  wizardPrevBtn = document.getElementById('wizardPrevBtn')
+  wizardSubmitBtn = document.getElementById('wizardSubmitBtn')
 
-  if (!quoteWizardModal || !quoteWizardForm) {
-    console.warn("Wizard elements not found")
-    return
-  }
+  if (!quoteWizardModal || !quoteWizardForm) return
 
-  // Open wizard and pre-fill data from contact form
   if (openQuoteWizardBtn) {
-    openQuoteWizardBtn.addEventListener("click", () => {
-      const contactName = document.getElementById("contactName")?.value || ""
-      const contactEmail = document.getElementById("contactEmail")?.value || ""
-      const contactPhone = document.getElementById("contactPhone")?.value || ""
-      const contactIsOwner = document.getElementById("contactIsOwner")?.checked || false
-
-      // Pre-fill wizard form
-      const wizardName = document.getElementById("wizardName")
-      const wizardEmail = document.getElementById("wizardEmail")
-      const wizardPhone = document.getElementById("wizardPhone")
-      const wizardIsOwner = document.getElementById("wizardIsOwner")
-      
-      if (wizardName) wizardName.value = contactName
-      if (wizardEmail) wizardEmail.value = contactEmail
-      if (wizardPhone) wizardPhone.value = contactPhone
-      if (wizardIsOwner) wizardIsOwner.checked = contactIsOwner
-
-      // Reset wizard to step 1
-      currentStep = 1
-      quoteWizardModal.classList.remove("hidden")
-      document.body.style.overflow = "hidden"
-      // Update steps after modal is visible
-      setTimeout(() => {
-        updateWizardSteps()
-      }, 100)
-    })
+    openQuoteWizardBtn.addEventListener('click', () => openWizard(null, false))
   }
 
-  // Portfolio card buttons - open wizard with pre-selected project
-  document.querySelectorAll(".portfolio-quote-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const projectName = btn.getAttribute("data-project")
-      const wizardPortfolioProject = document.getElementById("wizardPortfolioProject")
-      
-      // Pre-select the project in the select
-      if (wizardPortfolioProject && projectName) {
-        wizardPortfolioProject.value = projectName
-      }
-
-      // Reset wizard to step 1
-      currentStep = 1
-      quoteWizardModal.classList.remove("hidden")
-      document.body.style.overflow = "hidden"
-      // Update steps after modal is visible
-      setTimeout(() => {
-        updateWizardSteps()
-      }, 100)
+  document.querySelectorAll('.portfolio-quote-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sid = btn.getAttribute('data-service-id')
+      const serviceId = sid ? parseInt(sid) : null
+      openWizard(serviceId, !!serviceId)
     })
   })
 
-  // Listen for changes in project type selects to toggle steps
-  const wizardPortfolioProject = document.getElementById("wizardPortfolioProject")
-  const wizardProjectType = document.getElementById("wizardProjectType")
-  
-  if (wizardPortfolioProject) {
-    wizardPortfolioProject.addEventListener("change", () => {
-      updateWizardSteps()
-    })
-  }
-  
-  if (wizardProjectType) {
-    wizardProjectType.addEventListener("change", () => {
-      updateWizardSteps()
+  const serviceSelect = document.getElementById('wizardServiceId')
+  if (serviceSelect) {
+    serviceSelect.addEventListener('change', async () => {
+      if (wizardState.serviceLocked) return
+      const sid = parseInt(serviceSelect.value || '0')
+      if (sid) await loadQuestionsAndBuildSteps(sid)
     })
   }
 
-  // Close wizard
-  if (closeWizardBtn) {
-    closeWizardBtn.addEventListener("click", () => {
-      closeWizard()
-    })
-  }
-
+  if (closeWizardBtn) closeWizardBtn.addEventListener('click', closeWizard)
   if (quoteWizardModal) {
-    quoteWizardModal.addEventListener("click", (e) => {
-      if (e.target === quoteWizardModal || e.target.classList.contains("wizard-overlay")) {
-        closeWizard()
-      }
+    quoteWizardModal.addEventListener('click', (e) => {
+      if (e.target === quoteWizardModal || e.target.classList.contains('wizard-overlay')) closeWizard()
     })
   }
 
-  // Next step
   if (wizardNextBtn) {
-    wizardNextBtn.addEventListener("click", () => {
+    wizardNextBtn.addEventListener('click', () => {
       if (validateCurrentStep()) {
         currentStep++
         updateWizardSteps()
       }
     })
   }
-
-  // Previous step
   if (wizardPrevBtn) {
-    wizardPrevBtn.addEventListener("click", () => {
+    wizardPrevBtn.addEventListener('click', () => {
       currentStep--
       updateWizardSteps()
     })
   }
 
-  // Initial step update
+  rebuildStepIndicators()
   updateWizardSteps()
 }
 
-// Export functions needed by forms.js
 function getWizardFunctions() {
   return {
-    isBathroomProject,
-    isKitchenProject,
-    calculateBathroomCategory,
-    calculateKitchenCategory,
     validateCurrentStep,
     closeWizard,
     getCurrentStep: () => currentStep,
-    getTotalSteps: () => totalSteps
+    getTotalSteps: () => totalSteps,
+    getWizardState: () => ({ ...wizardState })
   }
 }
 

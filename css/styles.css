@@ -293,11 +293,28 @@ button,
 /* Wizard Form */
 .wizard-form {
   padding: 24px;
+  text-align: left;
+}
+
+/* Validation error state for wizard required fields */
+.validation-error-group {
+  outline: 2px solid #ef4444;
+  outline-offset: 2px;
+  border-radius: 0.375rem;
+}
+
+/* Service select when locked (portfolio flow) - keep enabled so value is submitted */
+select.service-locked {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  color: #6b7280;
+  pointer-events: none;
 }
 
 .wizard-step-content {
   display: none;
   animation: fadeIn 0.3s ease;
+  text-align: left;
 }
 
 .wizard-step-content.active {

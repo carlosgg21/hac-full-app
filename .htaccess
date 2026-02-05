@@ -1,0 +1,6 @@
+# Redirect default favicon request to actual location (avoids 404)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^favicon\.ico$ /public/favicons/favicon.ico [L]
+    RewriteRule ^browserconfig\.xml$ /public/favicons/browserconfig.xml [L]
+</IfModule>

@@ -15,6 +15,14 @@
     <meta name="revisit-after" content="7 days">
     <meta name="theme-color" content="#1e3a5f">
     
+    <!-- Favicons (solo críticos para menos peticiones) -->
+    <link rel="icon" href="/public/favicons/favicon.ico" type="image/x-icon" sizes="48x48">
+    <link rel="icon" href="/public/favicons/favicon-32x32.png" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="/public/favicons/apple-icon-180x180.png" sizes="180x180">
+    <link rel="manifest" href="/public/favicons/manifest.json">
+    <meta name="msapplication-TileColor" content="#1e3a5f">
+    <meta name="msapplication-config" content="/public/favicons/browserconfig.xml">
+    
     <!-- Canonical URL -->
     <link rel="canonical" href="https://www.hacrenovation.ca/">
     
@@ -29,10 +37,11 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts -->
+    <!-- Google Fonts (menos pesos = menos archivos, preload para prioridad) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     
     <!-- Tailwind Config -->
     <script>
@@ -98,7 +107,7 @@
             <div class="flex items-center justify-between h-20">
                 <!-- Logo with image from original site -->
                 <a href="#home" class="flex items-center space-x-3">
-                    <img src="public/logo.png" alt="HAC Logo" class="w-12 h-12 object-contain">
+                    <img src="public/logo.png" alt="HAC Logo" width="48" height="48" class="w-12 h-12 object-contain">
                     <div class="flex flex-col">
                         <span class="font-bold text-lg leading-none text-gray-900">H.A.C. Renovation Inc.</span>
                         <span class="text-xs text-gray-600 uppercase tracking-wider">Construction Company</span>
@@ -159,6 +168,7 @@
         <div class="absolute inset-0 z-0">
             <img src="public/modern-home.jpg" 
                  alt="Construction site" 
+                 width="1920" height="1080"
                  class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70"></div>
         </div>
@@ -211,6 +221,8 @@
                 <div class="relative">
                     <img src="public/about_us.jpeg" 
                          alt="Our team at work" 
+                         width="600" height="400"
+                         loading="lazy"
                          class="rounded-lg shadow-xl">
                 </div>
             </div>
@@ -234,6 +246,7 @@
                         <div class="relative">
                             <img src="public/before_01.jpg" 
                                  alt="Before" 
+                                 width="400" height="256" loading="lazy"
                                  class="w-full h-64 object-cover">
                             <div class="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_before">
                                 Before
@@ -242,6 +255,7 @@
                         <div class="relative">
                                    <img src="public/after_01.jpg"
                                  alt="After" 
+                                 width="400" height="256" loading="lazy"
                                  class="w-full h-64 object-cover">
                             <div class="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_after">
                                 After
@@ -251,7 +265,7 @@
                     <div class="p-6">
                         <h3 class="text-xl font-bold text-primary mb-2" data-translate="project1_title">Kitchen Renovation</h3>
                         <p class="text-gray-600 mb-4" data-translate="project1_desc">Complete kitchen remodel with new cabinets, countertops, and flooring</p>
-                        <button class="portfolio-quote-btn bg-accent text-white px-6 py-2 rounded-md font-medium hover:bg-accent-light transition-colors w-full" data-project="Kitchen Renovation" data-translate="form_get_quote">
+                        <button class="portfolio-quote-btn bg-accent text-white px-6 py-2 rounded-md font-medium hover:bg-accent-light transition-colors w-full" data-project="Kitchen Renovation" data-service-id="1" data-translate="form_get_quote">
                             Get Free Quote
                         </button>
                     </div>
@@ -263,6 +277,7 @@
                         <div class="relative">
                                   <img src="public/before_02.jpg"
                                  alt="Before" 
+                                 width="400" height="256" loading="lazy"
                                  class="w-full h-64 object-cover">
                             <div class="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_before">
                                 Before
@@ -271,6 +286,7 @@
                         <div class="relative">
                             <img src="public/after_02.jpg"
                                  alt="After" 
+                                 width="400" height="256" loading="lazy"
                                  class="w-full h-64 object-cover">
                             <div class="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_after">
                                 After
@@ -280,7 +296,7 @@
                     <div class="p-6">
                         <h3 class="text-xl font-bold text-primary mb-2" data-translate="project2_title">Bathroom Remodel</h3>
                         <p class="text-gray-600 mb-4" data-translate="project2_desc">Modern bathroom transformation with new fixtures and tiling</p>
-                        <button class="portfolio-quote-btn bg-accent text-white px-6 py-2 rounded-md font-medium hover:bg-accent-light transition-colors w-full" data-project="Bathroom Remodel" data-translate="form_get_quote">
+                        <button class="portfolio-quote-btn bg-accent text-white px-6 py-2 rounded-md font-medium hover:bg-accent-light transition-colors w-full" data-project="Bathroom Remodel" data-service-id="2" data-translate="form_get_quote">
                             Get Free Quote
                         </button>
                     </div>
@@ -292,6 +308,7 @@
                         <div class="relative">
                     <img src="public/before_03.jpg"
                                  alt="Before" 
+                                 width="400" height="256" loading="lazy"
                                  class="w-full h-64 object-cover">
                             <div class="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_before">
                                 Before
@@ -300,6 +317,7 @@
                         <div class="relative">
                               <img src="public/after_03.jpg"
                                  alt="After" 
+                                 width="400" height="256" loading="lazy"
                                  class="w-full h-64 object-cover">
                             <div class="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_after">
                                 After
@@ -309,7 +327,7 @@
                     <div class="p-6">
                         <h3 class="text-xl font-bold text-primary mb-2" data-translate="project3_title">Basement Finishing</h3>
                         <p class="text-gray-600 mb-4" data-translate="project3_desc">Complete basement conversion into livable entertainment space</p>
-                        <button class="portfolio-quote-btn bg-accent text-white px-6 py-2 rounded-md font-medium hover:bg-accent-light transition-colors w-full" data-project="Basement Finishing" data-translate="form_get_quote">
+                        <button class="portfolio-quote-btn bg-accent text-white px-6 py-2 rounded-md font-medium hover:bg-accent-light transition-colors w-full" data-project="Basement Finishing" data-service-id="3" data-translate="form_get_quote">
                             Get Free Quote
                         </button>
                     </div>
@@ -321,6 +339,7 @@
                         <div class="relative">
                                   <img src="public/before_04.jpg"
                                  alt="Before" 
+                                 width="400" height="256" loading="lazy"
                                  class="w-full h-64 object-cover">
                             <div class="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_before">
                                 Before
@@ -329,6 +348,7 @@
                         <div class="relative">
                               <img src="public/after_04.jpg"
                                  alt="After" 
+                                 width="400" height="256" loading="lazy"
                                  class="w-full h-64 object-cover">
                             <div class="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_after">
                                 After
@@ -338,7 +358,7 @@
                     <div class="p-6">
                         <h3 class="text-xl font-bold text-primary mb-2" data-translate="project4_title">Patio Construction</h3>
                         <p class="text-gray-600 mb-4" data-translate="project4_desc">Custom outdoor patio with premium materials and landscaping</p>
-                        <button class="portfolio-quote-btn bg-accent text-white px-6 py-2 rounded-md font-medium hover:bg-accent-light transition-colors w-full" data-project="Patio Construction" data-translate="form_get_quote">
+                        <button class="portfolio-quote-btn bg-accent text-white px-6 py-2 rounded-md font-medium hover:bg-accent-light transition-colors w-full" data-project="Patio Construction" data-service-id="4" data-translate="form_get_quote">
                             Get Free Quote
                         </button>
                     </div>
@@ -569,7 +589,7 @@
             <div class="footer-content grid md:grid-cols-4 gap-8 mb-8">
                 <div>
                     <div class="flex items-center space-x-3 mb-4">
-                        <img id="footerLogo" src="public/logo.png" alt="HAC Logo" class="w-10 h-10 object-contain bg-white rounded p-1">
+                        <img id="footerLogo" src="public/logo.png" alt="HAC Logo" width="40" height="40" loading="lazy" class="w-10 h-10 object-contain bg-white rounded p-1">
                         <div id="footerName" class="flex flex-col">
                             <span class="font-bold text-lg leading-none">H.A.C.</span>
                             <span class="text-xs text-gray-300 uppercase">Renovation Inc.</span>
@@ -725,15 +745,12 @@
                             </label>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Project from Portfolio *</label>
-                            <select id="wizardPortfolioProject" name="portfolio_project" required
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Service *</label>
+                            <select id="wizardServiceId" name="service_id" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
-                                <option value="">Select a project...</option>
-                                <option value="Kitchen Renovation">Kitchen Renovation</option>
-                                <option value="Bathroom Remodel">Bathroom Remodel</option>
-                                <option value="Basement Finishing">Basement Finishing</option>
-                                <option value="Patio Construction">Patio Construction</option>
+                                <option value="">Loading services...</option>
                             </select>
+                            <input type="hidden" id="wizardServiceLocked" name="service_locked" value="0">
                         </div>
                         <div class="flex items-start">
                             <input type="checkbox" id="wizardPrivacyPolicy" name="privacy_policy" required
@@ -745,499 +762,8 @@
                     </div>
                 </div>
 
-                <!-- Step 2: Project Details (Default) -->
-                <div class="wizard-step-content wizard-step-default" data-step="2">
-                    <h3 class="text-xl font-bold text-primary mb-6" data-translate="wizard_step2_title">Project Details</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="wizard_project_type">Project Type *</label>
-                            <select id="wizardProjectType" name="project_type" required
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
-                                <option value="">Select project type...</option>
-                                <option value="Kitchen">Kitchen Renovation</option>
-                                <option value="Bathroom">Bathroom Remodel</option>
-                                <option value="Basement">Basement Finishing</option>
-                                <option value="Patio">Patio & Fencing</option>
-                                <option value="Flooring">Floors & Tiling</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="wizard_property_type">Property Type *</label>
-                            <select id="wizardPropertyType" name="property_type" required
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
-                                <option value="">Select property type...</option>
-                                <option value="Residential">Residential</option>
-                                <option value="Commercial">Commercial</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="wizard_square_feet">Square Feet / Area</label>
-                            <input type="number" id="wizardSquareFeet" name="square_feet" min="0"
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                                   placeholder="e.g., 500">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 3: Budget & Time (Default) -->
-                <div class="wizard-step-content wizard-step-default" data-step="3">
-                    <h3 class="text-xl font-bold text-primary mb-6" data-translate="wizard_step3_title">Budget & Timeline</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="wizard_budget">Budget Range *</label>
-                            <select id="wizardBudget" name="budget" required
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
-                                <option value="">Select budget range...</option>
-                                <option value="Under $10k">Under $10,000</option>
-                                <option value="$10k-$25k">$10,000 - $25,000</option>
-                                <option value="$25k-$50k">$25,000 - $50,000</option>
-                                <option value="$50k-$100k">$50,000 - $100,000</option>
-                                <option value="Over $100k">Over $100,000</option>
-                                <option value="Not sure">Not sure</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="wizard_timeline">Timeline *</label>
-                            <select id="wizardTimeline" name="timeline" required
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
-                                <option value="">Select timeline...</option>
-                                <option value="ASAP">ASAP</option>
-                                <option value="1-3 months">1-3 months</option>
-                                <option value="3-6 months">3-6 months</option>
-                                <option value="6+ months">6+ months</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="wizard_preferred_contact">Preferred Contact Method *</label>
-                            <select id="wizardPreferredContact" name="preferred_contact" required
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
-                                <option value="">Select contact method...</option>
-                                <option value="Phone">Phone</option>
-                                <option value="Email">Email</option>
-                                <option value="Text">Text Message</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 4: Review & Submit (Default) -->
-                <div class="wizard-step-content wizard-step-default" data-step="4">
-                    <h3 class="text-xl font-bold text-primary mb-6" data-translate="wizard_step4_title">Review & Submit</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="form_message">Additional Notes (Optional)</label>
-                            <textarea id="wizardMessage" name="message" rows="4"
-                                      class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                                      placeholder="Any additional information about your project..."></textarea>
-                        </div>
-                        <div class="bg-gray-50 rounded-lg p-4 space-y-2">
-                            <h4 class="font-semibold text-gray-900 mb-3" data-translate="wizard_review_title">Review Your Information:</h4>
-                            <div id="wizardReview" class="text-sm text-gray-700 space-y-1"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 2: Bathroom Discovery - Part 1 -->
-                <div class="wizard-step-content wizard-step-bathroom hidden" data-step="2">
-                    <h3 class="text-xl font-bold text-primary mb-6">Bathroom Project Discovery</h3>
-                    <div class="space-y-6">
-                        <!-- Question 1: Main Goal -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">1. What is your main goal for this bathroom? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_goal" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>Refresh and modernize it, keeping things simple and functional</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_goal" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>Upgrade it for comfort, durability, and a modern look</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_goal" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>Create a spa-like bathroom with premium finishes</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Question 2: Layout -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">2. Are you planning to keep the existing layout? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_layout" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>Yes, no plumbing changes</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_layout" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>Possibly small changes (vanity or shower location)</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_layout" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>No, I want a full redesign</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Question 3: Shower/Tub -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">3. What type of shower or tub are you envisioning? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_shower_tub" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>Existing tub or acrylic shower base</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_shower_tub" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>Tiled shower with glass enclosure</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_shower_tub" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>Custom walk-in shower and/or freestanding tub</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 3: Bathroom Discovery - Part 2 -->
-                <div class="wizard-step-content wizard-step-bathroom hidden" data-step="3">
-                    <h3 class="text-xl font-bold text-primary mb-6">Bathroom Project Discovery (Continued)</h3>
-                    <div class="space-y-6">
-                        <!-- Question 4: Finishes -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">4. What level of finishes do you prefer? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_finishes" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>Simple, durable, and cost-effective</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_finishes" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>Modern and stylish with upgraded materials</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_finishes" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>High-end, luxury, and design-focused</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Question 5: Vanity -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">5. What type of vanity are you interested in? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_vanity" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>Standard vanity with laminate top</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_vanity" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>Semi-custom vanity with quartz countertop</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_vanity" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>Custom vanity with stone or designer finishes</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Question 6: Upgrades (Multiple selection) -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">6. Are upgrades like these important to you? (Select all that apply)</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" name="bathroom_upgrades" value="heated_floors" class="mt-1 mr-3">
-                                    <span>Heated floors</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" name="bathroom_upgrades" value="shower_niches" class="mt-1 mr-3">
-                                    <span>Shower niches or built-in storage</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" name="bathroom_upgrades" value="rain_shower" class="mt-1 mr-3">
-                                    <span>Rain shower or upgraded fixtures</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" name="bathroom_upgrades" value="smart_features" class="mt-1 mr-3">
-                                    <span>Smart mirrors / lighting / steam shower</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 4: Bathroom Discovery - Part 3 + Review -->
-                <div class="wizard-step-content wizard-step-bathroom hidden" data-step="4">
-                    <h3 class="text-xl font-bold text-primary mb-6">Bathroom Project Discovery (Final)</h3>
-                    <div class="space-y-6">
-                        <!-- Question 7: Durability -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">7. How important is long-term durability and waterproofing? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_durability" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>Standard installation is fine</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_durability" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>I want proper waterproofing systems</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_durability" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>I want top-tier systems and materials</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Question 8: Budget -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">8. Which budget range best aligns with your expectations? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_budget" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>$10,000 – $18,000</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_budget" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>$18,000 – $30,000</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="bathroom_budget" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>$30,000 – $60,000+</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Additional Notes -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="form_message">Additional Notes (Optional)</label>
-                            <textarea id="wizardMessageBathroom" name="message" rows="4"
-                                      class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                                      placeholder="Any additional information about your project..."></textarea>
-                        </div>
-
-                        <!-- Review Section -->
-                        <div class="bg-gray-50 rounded-lg p-4 space-y-2">
-                            <h4 class="font-semibold text-gray-900 mb-3" data-translate="wizard_review_title">Review Your Information:</h4>
-                            <div id="wizardReviewBathroom" class="text-sm text-gray-700 space-y-1"></div>
-                            <div id="bathroomCategoryResult" class="mt-4 p-3 bg-primary/10 rounded-md border border-primary/20">
-                                <p class="font-semibold text-primary">Recommended Category: <span id="bathroomCategoryValue" class="text-accent"></span></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 2: Kitchen Discovery - Part 1 -->
-                <div class="wizard-step-content wizard-step-kitchen hidden" data-step="2">
-                    <h3 class="text-xl font-bold text-primary mb-6">Kitchen Project Discovery</h3>
-                    <div class="space-y-6">
-                        <!-- Question 1: Main Goal -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">1. What is your main goal for this kitchen? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_goal" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>Refresh the look while keeping the kitchen functional</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_goal" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>Upgrade for better flow, storage, and a modern style</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_goal" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>Create a custom, design-driven kitchen experience</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Question 2: Layout -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">2. Are you planning to keep the existing kitchen layout? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_layout" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>Yes, no changes to plumbing or electrical</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_layout" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>Minor adjustments (appliance relocation, island addition)</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_layout" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>No, I want a full layout redesign</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Question 3: Cabinetry -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">3. What type of cabinetry are you interested in? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_cabinetry" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>Stock cabinets or refacing existing cabinets</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_cabinetry" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>Semi-custom cabinets with upgraded storage options</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_cabinetry" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>Fully custom cabinetry built to fit the space</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 3: Kitchen Discovery - Part 2 -->
-                <div class="wizard-step-content wizard-step-kitchen hidden" data-step="3">
-                    <h3 class="text-xl font-bold text-primary mb-6">Kitchen Project Discovery (Continued)</h3>
-                    <div class="space-y-6">
-                        <!-- Question 4: Finishes -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">4. What level of finishes do you prefer? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_finishes" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>Simple, durable, and cost-effective</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_finishes" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>Modern finishes with upgraded materials</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_finishes" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>Luxury finishes and designer details</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Question 5: Countertop -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">5. What type of countertop are you considering? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_countertop" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>Laminate or entry-level materials</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_countertop" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>Quartz or upgraded stone</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_countertop" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>Natural stone or premium surfaces</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Question 6: Upgrades (Multiple selection) -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">6. Are you planning to add or upgrade any of the following? (Select all that apply)</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" name="kitchen_upgrades" value="kitchen_island" class="mt-1 mr-3">
-                                    <span>Kitchen island or peninsula</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" name="kitchen_upgrades" value="soft_close" class="mt-1 mr-3">
-                                    <span>Soft-close drawers & organizers</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" name="kitchen_upgrades" value="under_cabinet_lighting" class="mt-1 mr-3">
-                                    <span>Under-cabinet lighting</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" name="kitchen_upgrades" value="built_in_pantry" class="mt-1 mr-3">
-                                    <span>Built-in pantry or custom storage</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 4: Kitchen Discovery - Part 3 + Review -->
-                <div class="wizard-step-content wizard-step-kitchen hidden" data-step="4">
-                    <h3 class="text-xl font-bold text-primary mb-6">Kitchen Project Discovery (Final)</h3>
-                    <div class="space-y-6">
-                        <!-- Question 7: Appliances -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">7. What appliance level are you aiming for? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_appliances" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>Existing appliances or standard replacements</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_appliances" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>New appliances with better efficiency and features</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_appliances" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>Panel-ready or high-end integrated appliances</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Question 8: Durability -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">8. How important is long-term durability and craftsmanship? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_durability" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>Standard installation is fine</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_durability" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>I want quality materials and solid installation</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_durability" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>I want premium craftsmanship and long-term value</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Question 9: Budget -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">9. Which budget range best aligns with your expectations? *</label>
-                            <div class="space-y-2">
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_budget" value="basic" required class="mt-1 mr-3" data-category="basic">
-                                    <span>$15,000 – $25,000</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_budget" value="mid-range" required class="mt-1 mr-3" data-category="mid-range">
-                                    <span>$25,000 – $45,000</span>
-                                </label>
-                                <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="kitchen_budget" value="high-end" required class="mt-1 mr-3" data-category="high-end">
-                                    <span>$45,000 – $80,000+</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Additional Notes -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="form_message">Additional Notes (Optional)</label>
-                            <textarea id="wizardMessageKitchen" name="message" rows="4"
-                                      class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                                      placeholder="Any additional information about your project..."></textarea>
-                        </div>
-
-                        <!-- Review Section -->
-                        <div class="bg-gray-50 rounded-lg p-4 space-y-2">
-                            <h4 class="font-semibold text-gray-900 mb-3" data-translate="wizard_review_title">Review Your Information:</h4>
-                            <div id="wizardReviewKitchen" class="text-sm text-gray-700 space-y-1"></div>
-                            <div id="kitchenCategoryResult" class="mt-4 p-3 bg-primary/10 rounded-md border border-primary/20">
-                                <p class="font-semibold text-primary">Recommended Category: <span id="kitchenCategoryValue" class="text-accent"></span></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Dynamic steps (questions + math/review) - populated by wizard.js -->
+                <div id="wizardDynamicSteps"></div>
 
                 <!-- Navigation Buttons -->
                 <div class="wizard-navigation">
@@ -1252,6 +778,7 @@
     <!-- Load scripts in order: translations first (no dependencies), then UI, wizard, forms, and finally main -->
     <script src="js/translations.js"></script>
     <script src="js/api.js"></script>
+    <script src="js/notify.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/wizard.js"></script>
     <script src="js/forms.js"></script>

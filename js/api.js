@@ -72,6 +72,15 @@ const API = {
      */
     async getServices() {
         return await this.get('services');
+    },
+
+    /**
+     * Get questions for a service
+     * @param {number} serviceId - Service ID
+     * @returns {Promise<Array>} List of questions
+     */
+    async getQuestions(serviceId) {
+        return await this.get('questions', `service_id=${serviceId}`);
     }
 };
 

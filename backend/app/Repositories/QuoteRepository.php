@@ -95,7 +95,7 @@ class QuoteRepository extends BaseRepository
      */
     public function getAnswers($quoteId)
     {
-        $sql = "SELECT qa.*, q.question_text, q.category, q.question_type
+        $sql = "SELECT qa.*, q.question_text, q.question_type
                 FROM quote_answers qa
                 INNER JOIN questions q ON qa.question_id = q.id
                 WHERE qa.quote_id = :quote_id

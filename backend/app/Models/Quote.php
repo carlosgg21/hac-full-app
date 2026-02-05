@@ -73,11 +73,13 @@ class Quote
             $data['created_by'] = Auth::id();
         }
         
+        $answers = $data['answers'] ?? null;
+        unset($data['answers']);
         $quoteId = $repo->create($data);
         
         // Guardar respuestas si existen
-        if (isset($data['answers']) && is_array($data['answers'])) {
-            self::saveAnswers($quoteId, $data['answers']);
+        if ($answers !== null && is_array($answers)) {
+            self::saveAnswers($quoteId, $answers);
         }
         
         return $quoteId;
