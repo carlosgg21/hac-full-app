@@ -137,13 +137,35 @@ class Client
 
     /**
      * Buscar con cotizaciones
+     * @param int|null $limit
+     * @param int $offset
+     * @param string $orderBy name|phone|quotes|created_at
+     * @param string $orderDir asc|desc
      */
-    public static function withQuotes($limit = null)
+    public static function withQuotes($limit = null, $offset = 0, $orderBy = 'created_at', $orderDir = 'desc')
     {
         $repo = new ClientRepository();
-        $clients = $repo->findWithQuotes($limit);
+        $clients = $repo->findWithQuotes($limit, $offset, $orderBy, $orderDir);
         $clients = self::addFullName($clients);
         return self::addFullAddress($clients);
+    }
+
+    /**
+     * Total de clientes
+     */
+    public static function count()
+    {
+        $repo = new ClientRepository();
+        return $repo->getCount();
+    }
+
+    /**
+     * Total de clientes que coinciden con búsqueda
+     */
+    public static function searchCount($term)
+    {
+        $repo = new ClientRepository();
+        return $repo->getSearchCount($term);
     }
 
     /**
@@ -153,6 +175,21 @@ class Client
     {
         $repo = new ClientRepository();
         $clients = $repo->search($term);
+        $clients = self::addFullName($clients);
+        return self::addFullAddress($clients);
+    }
+
+    /**
+     * Buscar clientes con cantidad de cotizaciones
+     * @param int|null $limit
+     * @param int $offset
+     * @param string $orderBy name|phone|quotes|created_at
+     * @param string $orderDir asc|desc
+     */
+    public static function searchWithQuotes($term, $limit = null, $offset = 0, $orderBy = 'created_at', $orderDir = 'desc')
+    {
+        $repo = new ClientRepository();
+        $clients = $repo->searchWithQuotes($term, $limit, $offset, $orderBy, $orderDir);
         $clients = self::addFullName($clients);
         return self::addFullAddress($clients);
     }

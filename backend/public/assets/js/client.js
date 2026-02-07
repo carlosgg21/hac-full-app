@@ -49,12 +49,7 @@
         input.addEventListener('input', runFilter);
         input.addEventListener('search', runFilter);
 
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                runFilter();
-            });
-        }
+        // Form submit goes to server (search + pagination). Input/search events filter current page only.
     }
 
     function initActionsMenu() {
@@ -131,6 +126,7 @@
             xhr.onreadystatechange = function() {
                 if (xhr.readyState !== 4) return;
                 if (xhr.status >= 200 && xhr.status < 300) {
+                    if (window.appToast) appToast({ type: 'success', text: 'Notes saved successfully.' });
                     if (onSuccess) onSuccess();
                 } else {
                     if (window.appToast) appToast({ type: 'error', text: 'Failed to save notes. Please try again.' });

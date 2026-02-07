@@ -28,10 +28,31 @@
         .input-with-icon { border: 1px solid #d1d5db; }
         .input-with-icon:focus-within { border-color: #1e3a5f; box-shadow: 0 0 0 2px rgba(30, 58, 95, 0.2); }
         .input-with-icon input { outline: none; }
+        #loginLoader {
+            position: fixed; inset: 0; z-index: 9999;
+            background: #f3f4f6;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 1rem;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        #loginLoader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .login-spinner {
+            width: 48px; height: 48px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #1e3a5f;
+            border-radius: 50%;
+            animation: login-spin 0.8s linear infinite;
+        }
+        .login-loader-text { font-size: 0.875rem; color: #6b7280; }
+        @keyframes login-spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen bg-gray-100 flex items-center justify-center font-sans antialiased">
-    <div class="w-full max-w-md mx-4">
+    <div id="loginLoader" aria-live="polite" aria-label="Loading">
+        <div class="login-spinner" aria-hidden="true"></div>
+        <span class="login-loader-text">Loading...</span>
+    </div>
+    <div class="w-full max-w-md mx-4" id="loginContent">
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
             <h1 class="text-xl font-semibold text-primary text-center mb-1">H.A.C. Renovation</h1>
             <p class="text-gray-500 text-sm text-center mb-6">Enter your credentials to continue</p>
@@ -73,6 +94,15 @@
     </div>
     <script>
         (function() {
+            function hideLoader() {
+                var loader = document.getElementById('loginLoader');
+                if (loader) loader.classList.add('hidden');
+            }
+            if (document.readyState === 'complete') {
+                hideLoader();
+            } else {
+                window.addEventListener('load', hideLoader);
+            }
             var btn = document.getElementById('togglePassword');
             var input = document.getElementById('password');
             var icon = document.getElementById('togglePasswordIcon');

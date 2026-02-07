@@ -143,7 +143,8 @@ ob_start();
     </div>
 </div>
 
-<!-- Script para gráficos ApexCharts -->
+<!-- ApexCharts: solo en dashboard -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
     // Services Chart (Bar) - ApexCharts
     const services = ['Painting', 'Demolition', 'Electricity', 'Plumbing', 'Remodeling'];

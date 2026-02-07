@@ -19,17 +19,41 @@ class ClientController
     public function index()
     {
         $search = $_GET['search'] ?? '';
-        
+        $sort = $_GET['sort'] ?? 'created_at';
+        $order = strtolower($_GET['order'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
+        $page = max(1, (int)($_GET['page'] ?? 1));
+        $perPage = (int)($_GET['per_page'] ?? 10);
+        if (!in_array($perPage, [10, 15, 25], true)) {
+            $perPage = 10;
+        }
+        if (!in_array($sort, ['name', 'phone', 'quotes', 'created_at'], true)) {
+            $sort = 'created_at';
+        }
+
+        $totalCount = $search ? Client::searchCount($search) : Client::count();
+        $totalPages = $totalCount > 0 ? (int)ceil($totalCount / $perPage) : 1;
+        $page = min(max(1, $page), $totalPages);
+        $offset = ($page - 1) * $perPage;
+
         if ($search) {
-            $clients = Client::search($search);
+            $clients = Client::searchWithQuotes($search, $perPage, $offset, $sort, $order);
         } else {
-            $clients = Client::withQuotes();
+            $clients = Client::withQuotes($perPage, $offset, $sort, $order);
         }
 
         if (self::isApiRequest()) {
             Response::success('Clients retrieved', $clients);
         } else {
-            Response::view('clients/index', ['clients' => $clients, 'search' => $search]);
+            Response::view('clients/index', [
+                'clients' => $clients,
+                'search' => $search,
+                'sort' => $sort,
+                'order' => $order,
+                'page' => $page,
+                'per_page' => $perPage,
+                'total_count' => $totalCount,
+                'total_pages' => $totalPages,
+            ]);
         }
     }
 
@@ -168,7 +192,8 @@ class ClientController
         if (self::isApiRequest()) {
             Response::success('Client deleted');
         } else {
-            Response::redirect('/clients?deleted=1');
+            $_SESSION['success'] = 'Client deleted successfully';
+            Response::redirect('/clients');
         }
     }
 

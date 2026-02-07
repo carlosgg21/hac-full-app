@@ -32,6 +32,8 @@
     $basePath = defined('BASE_PATH_URL') ? BASE_PATH_URL : '/backend';
     $fontsPath = $basePath . '/public/assets/fonts/inter/fonts.css';
     $iconsPath = $basePath . '/public/assets/icons/bootstrap-icons/bootstrap-icons.css';
+    $layoutSuccessMessage = isset($_SESSION['success']) ? $_SESSION['success'] : null;
+    if ($layoutSuccessMessage !== null) unset($_SESSION['success']);
     ?>
     <link rel="stylesheet" href="<?= $fontsPath ?>">
     
@@ -40,9 +42,6 @@
     
     <!-- Toastify -->
     <link rel="stylesheet" href="<?= $basePath ?>/public/assets/node_module/toastify-js/toastify.css">
-    
-    <!-- ApexCharts CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     
     <style>
         body, html { height: 100%; }
@@ -202,12 +201,7 @@
         
         <!-- Main Content -->
         <main class="main-content flex-1 flex flex-col">
-            <!-- Mensajes de sesión -->
-            <?php if (isset($_SESSION['success'])): ?>
-                <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
-                    <?= htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?>
-                </div>
-            <?php endif; ?>
+            <!-- Mensajes de sesión: success → toast al final del layout -->
             
             <?php if (isset($_SESSION['error'])): ?>
                 <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
@@ -341,6 +335,9 @@
                 style: { background: colors[type] || colors.info }
             }).showToast();
         };
+        <?php if (!empty($layoutSuccessMessage)): ?>
+        appToast({ type: 'success', text: <?= json_encode($layoutSuccessMessage) ?> });
+        <?php endif; ?>
     </script>
 </body>
 </html>
