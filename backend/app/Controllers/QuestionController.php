@@ -177,8 +177,7 @@ class QuestionController
         if (self::isApiRequest()) {
             Response::success('Question deleted');
         } else {
-            $_SESSION['success'] = 'Question deleted successfully';
-            Response::redirect('/questions');
+            Response::redirect('/questions?deleted=1');
         }
     }
 

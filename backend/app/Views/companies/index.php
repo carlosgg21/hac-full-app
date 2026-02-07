@@ -328,7 +328,7 @@ document.getElementById('companyForm').addEventListener('submit', function(e) {
     const name = document.getElementById('name').value.trim();
     if (!name) {
         e.preventDefault();
-        alert('Company name is required');
+        appToast({ type: 'error', text: 'Company name is required' });
         document.getElementById('name').focus();
         return false;
     }

@@ -128,8 +128,7 @@ class ServiceController
         if (self::isApiRequest()) {
             Response::success('Service deleted');
         } else {
-            $_SESSION['success'] = 'Service deleted successfully';
-            Response::redirect('/services');
+            Response::redirect('/services?deleted=1');
         }
     }
 

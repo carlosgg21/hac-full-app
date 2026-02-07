@@ -168,8 +168,7 @@ class ClientController
         if (self::isApiRequest()) {
             Response::success('Client deleted');
         } else {
-            $_SESSION['success'] = 'Client deleted successfully';
-            Response::redirect('/clients');
+            Response::redirect('/clients?deleted=1');
         }
     }
 

@@ -1,38 +1,31 @@
 <?php
 /**
  * H.A.C. Renovation - API Auth Endpoint
+ * Delega en AuthController (mismo patrón que clients, projects, etc.).
  */
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+$input = json_decode(file_get_contents('php://input'), true) ?? [];
+$body = array_merge($_POST, $input);
 
 switch ($method) {
     case 'POST':
-        // Login
-        $username = $_POST['username'] ?? json_decode(file_get_contents('php://input'), true)['username'] ?? '';
-        $password = $_POST['password'] ?? json_decode(file_get_contents('php://input'), true)['password'] ?? '';
-
-        if (empty($username) || empty($password)) {
-            Response::error('Username and password are required', null, 400);
+        $result = AuthController::attemptLogin(
+            $body['username'] ?? '',
+            $body['password'] ?? ''
+        );
+        if ($result['success']) {
+            Response::success($result['message'], ['user' => $result['user']], $result['code']);
         }
-
-        $user = User::authenticate($username, $password);
-
-        if ($user) {
-            Auth::login($user);
-            Response::success('Login successful', ['user' => Auth::user()]);
-        } else {
-            Response::error('Invalid credentials', null, 401);
-        }
+        Response::error($result['message'], null, $result['code']);
         break;
 
     case 'DELETE':
-        // Logout
         Auth::logout();
         Response::success('Session closed');
         break;
 
     case 'GET':
-        // Verificar autenticación
         if (Auth::check()) {
             Response::success('User authenticated', ['user' => Auth::user()]);
         } else {

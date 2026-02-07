@@ -38,6 +38,9 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="<?= $iconsPath ?>">
     
+    <!-- Toastify -->
+    <link rel="stylesheet" href="<?= $basePath ?>/public/assets/node_module/toastify-js/toastify.css">
+    
     <!-- ApexCharts CDN -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     
@@ -321,6 +324,23 @@
         if (sidebarBackdrop) {
             sidebarBackdrop.style.display = 'none';
         }
+    </script>
+    
+    <!-- Toastify + appToast helper -->
+    <script src="<?= $basePath ?>/public/assets/node_module/toastify-js/toastify.js"></script>
+    <script>
+        window.appToast = function(opts) {
+            var type = (opts && opts.type) || 'info';
+            var text = (opts && opts.text) || '';
+            var colors = { success: '#10b981', error: '#dc2626', info: '#1e3a5f' };
+            Toastify({
+                text: text,
+                duration: 4000,
+                gravity: 'top',
+                position: 'right',
+                style: { background: colors[type] || colors.info }
+            }).showToast();
+        };
     </script>
 </body>
 </html>

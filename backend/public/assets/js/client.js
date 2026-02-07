@@ -133,10 +133,10 @@
                 if (xhr.status >= 200 && xhr.status < 300) {
                     if (onSuccess) onSuccess();
                 } else {
-                    alert('Failed to save notes. Please try again.');
+                    if (window.appToast) appToast({ type: 'error', text: 'Failed to save notes. Please try again.' });
                 }
             };
-            xhr.onerror = function() { alert('Failed to save notes. Please try again.'); };
+            xhr.onerror = function() { if (window.appToast) appToast({ type: 'error', text: 'Failed to save notes. Please try again.' }); };
             xhr.send(JSON.stringify({ notes: notes }));
         }
 

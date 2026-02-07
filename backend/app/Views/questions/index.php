@@ -1,50 +1,120 @@
 <?php
 $title = 'Questions';
+$questionsCount = is_array($questions) ? count($questions) : 0;
 ob_start();
 ?>
 
-<div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-bold text-gray-800">Questions</h1>
-    <a href="<?= Response::url('/questions/create') ?>" class="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-light transition">
-        New Question
-    </a>
+<?php $basePath = defined('BASE_PATH_URL') ? BASE_PATH_URL : '/backend'; ?>
+<div class="mb-6">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+        <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary">
+                <i class="bi bi-question-circle-fill text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Questions</h1>
+                <p class="text-sm text-gray-500 mt-0.5"><?= $questionsCount ?> <?= $questionsCount === 1 ? 'question' : 'questions' ?></p>
+            </div>
+        </div>
+        <a href="<?= Response::url('/questions/create') ?>" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary-light transition shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+            <i class="bi bi-plus-lg text-base"></i>
+            New Question
+        </a>
+    </div>
 </div>
 
-<section class="bg-white rounded-xl shadow-md px-6 py-5 w-full overflow-x-auto">
+<section class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full overflow-x-auto">
     <table class="min-w-full">
         <thead>
-            <tr class="bg-gray-100 text-gray-700 border-b border-gray-200">
-                <th class="py-3 px-4 text-left text-sm font-semibold">ID</th>
-                <th class="py-3 px-4 text-left text-sm font-semibold">Service</th>
-                <th class="py-3 px-4 text-left text-sm font-semibold">Question</th>
-                <th class="py-3 px-4 text-left text-sm font-semibold">Type</th>
-                <th class="py-3 px-4 text-left text-sm font-semibold">Order</th>
-                <th class="py-3 px-4 text-left text-sm font-semibold">Status</th>
-                <th class="py-3 px-4 text-left text-sm font-semibold">Actions</th>
+            <tr class="bg-gray-50/80 text-gray-600 border-b border-gray-200">
+                <th class="py-3.5 px-5 text-left text-xs font-semibold uppercase tracking-wider">
+                    <span class="inline-flex items-center gap-2">
+                        <i class="bi bi-hash text-gray-400"></i>
+                        ID
+                    </span>
+                </th>
+                <th class="py-3.5 px-5 text-left text-xs font-semibold uppercase tracking-wider">
+                    <span class="inline-flex items-center gap-2">
+                        <i class="bi bi-briefcase text-gray-400"></i>
+                        Service
+                    </span>
+                </th>
+                <th class="py-3.5 px-5 text-left text-xs font-semibold uppercase tracking-wider">
+                    <span class="inline-flex items-center gap-2">
+                        <i class="bi bi-chat-text text-gray-400"></i>
+                        Question
+                    </span>
+                </th>
+                <th class="py-3.5 px-5 text-left text-xs font-semibold uppercase tracking-wider">
+                    <span class="inline-flex items-center gap-2">
+                        <i class="bi bi-list-ul text-gray-400"></i>
+                        Type
+                    </span>
+                </th>
+                <th class="py-3.5 px-5 text-left text-xs font-semibold uppercase tracking-wider">
+                    <span class="inline-flex items-center gap-2">
+                        <i class="bi bi-sort-numeric-down text-gray-400"></i>
+                        Order
+                    </span>
+                </th>
+                <th class="py-3.5 px-5 text-left text-xs font-semibold uppercase tracking-wider">
+                    <span class="inline-flex items-center gap-2">
+                        <i class="bi bi-toggle-on text-gray-400"></i>
+                        Status
+                    </span>
+                </th>
+                <th class="py-3.5 px-5 text-right text-xs font-semibold uppercase tracking-wider w-24">
+                    <span class="inline-flex items-center gap-2">
+                        <i class="bi bi-gear text-gray-400"></i>
+                        Actions
+                    </span>
+                </th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($questions)): ?>
                 <tr>
-                    <td colspan="7" class="py-8 text-center text-gray-500">No hay preguntas</td>
+                    <td colspan="7" class="py-16 text-center">
+                        <div class="flex flex-col items-center gap-3 text-gray-400">
+                            <i class="bi bi-question-circle text-5xl"></i>
+                            <p class="text-gray-500 font-medium">No questions yet</p>
+                            <a href="<?= Response::url('/questions/create') ?>" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg transition">Add your first question</a>
+                        </div>
+                    </td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($questions as $question): ?>
-                    <tr class="border-b hover:bg-gray-50 transition">
-                        <td class="py-3 px-4 text-sm"><?= $question['id'] ?></td>
-                        <td class="py-3 px-4 text-sm text-gray-600"><?= htmlspecialchars($question['service_name'] ?? $question['category'] ?? 'N/A') ?></td>
-                        <td class="py-3 px-4 text-sm"><?= htmlspecialchars($question['question_text'] ?? '') ?></td>
-                        <td class="py-3 px-4 text-sm text-gray-600"><?= htmlspecialchars($question['question_type'] ?? '') ?></td>
-                        <td class="py-3 px-4 text-sm text-gray-600"><?= $question['order'] ?? 0 ?></td>
-                        <td class="py-3 px-4">
-                            <span class="px-2 py-1 text-xs font-semibold rounded-full 
-                                <?= ($question['is_active'] ?? 0) ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' ?>">
+                    <?php $deleteFormId = 'delete-form-question-' . (int)$question['id']; ?>
+                    <tr class="border-b border-gray-100 hover:bg-gray-50/50 transition">
+                        <td class="py-3.5 px-5 text-sm text-gray-600"><?= $question['id'] ?></td>
+                        <td class="py-3.5 px-5 text-sm text-gray-600"><?= htmlspecialchars($question['service_name'] ?? $question['category'] ?? 'N/A') ?></td>
+                        <td class="py-3.5 px-5 text-sm font-medium text-gray-800"><?= htmlspecialchars($question['question_text'] ?? '') ?></td>
+                        <td class="py-3.5 px-5 text-sm text-gray-600"><?= htmlspecialchars($question['question_type'] ?? '') ?></td>
+                        <td class="py-3.5 px-5 text-sm text-gray-600"><?= $question['order'] ?? 0 ?></td>
+                        <td class="py-3.5 px-5">
+                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full <?= ($question['is_active'] ?? 0) ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' ?>">
                                 <?= ($question['is_active'] ?? 0) ? 'Active' : 'Inactive' ?>
                             </span>
                         </td>
-                        <td class="py-3 px-4">
-                            <a href="<?= Response::url('/questions/' . $question['id'] . '/edit') ?>" class="text-primary hover:text-primary-light text-sm font-medium mr-3">Edit</a>
-                            <a href="<?= Response::url('/questions/' . $question['id']) ?>" onclick="return confirm('¿Está seguro de eliminar esta pregunta?')" class="text-red-600 hover:text-red-800 text-sm font-medium">Delete</a>
+                        <td class="py-3.5 px-5 text-right">
+                            <div class="relative inline-block group">
+                                <button type="button" class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/20 transition" aria-label="Actions" aria-haspopup="true" onclick="var m=this.nextElementSibling; document.querySelectorAll('.question-actions-menu').forEach(function(x){if(x!==m)x.classList.add('hidden');}); m.classList.toggle('hidden');">
+                                    <i class="bi bi-three-dots-vertical text-lg"></i>
+                                </button>
+                                <div class="question-actions-menu hidden absolute right-0 top-full mt-1 py-1 min-w-[140px] bg-white rounded-xl shadow-lg border border-gray-200 z-20">
+                                    <a href="<?= Response::url('/questions/' . $question['id'] . '/edit') ?>" class="flex items-center gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition first:rounded-t-xl">
+                                        <i class="bi bi-pencil text-gray-500"></i>
+                                        Edit
+                                    </a>
+                                    <button type="button" class="question-delete-action flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 transition w-full text-left last:rounded-b-xl" data-form-id="<?= $deleteFormId ?>">
+                                        <i class="bi bi-trash"></i>
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                            <form id="<?= $deleteFormId ?>" method="POST" action="<?= Response::url('/questions/' . (int)$question['id']) ?>" style="display: none;">
+                                <input type="hidden" name="_method" value="DELETE">
+                            </form>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -52,6 +122,62 @@ ob_start();
         </tbody>
     </table>
 </section>
+
+<dialog id="questionDeleteDialog" class="rounded-xl shadow-xl border border-gray-200 p-0 w-full max-w-md backdrop:bg-black/30" aria-labelledby="questionDeleteDialogTitle" aria-describedby="questionDeleteDialogDesc">
+    <div class="p-6">
+        <h2 id="questionDeleteDialogTitle" class="text-lg font-semibold text-gray-800 mb-2">Delete question</h2>
+        <p id="questionDeleteDialogDesc" class="text-sm text-gray-600 mb-6">Are you sure you want to delete this question?</p>
+        <div class="flex justify-end gap-3">
+            <button type="button" class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition" onclick="document.getElementById('questionDeleteDialog').close();">Cancel</button>
+            <button type="button" id="questionDeleteDialogConfirm" class="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition">Delete</button>
+        </div>
+    </div>
+</dialog>
+
+<script>
+(function() {
+    var dialog = document.getElementById('questionDeleteDialog');
+    var confirmBtn = document.getElementById('questionDeleteDialogConfirm');
+    document.querySelectorAll('.question-delete-action').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var formId = this.getAttribute('data-form-id');
+            if (formId) {
+                window.questionDeleteFormId = formId;
+                document.querySelectorAll('.question-actions-menu').forEach(function(m) { m.classList.add('hidden'); });
+                if (dialog) dialog.showModal();
+            }
+        });
+    });
+    if (dialog && confirmBtn) {
+        confirmBtn.addEventListener('click', function() {
+            var formId = window.questionDeleteFormId;
+            if (formId) {
+                var form = document.getElementById(formId);
+                if (form) form.submit();
+                window.questionDeleteFormId = null;
+            }
+            dialog.close();
+        });
+        dialog.addEventListener('click', function(e) {
+            if (e.target === dialog) dialog.close();
+        });
+    }
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.relative.inline-block.group')) {
+            document.querySelectorAll('.question-actions-menu').forEach(function(m) { m.classList.add('hidden'); });
+        }
+    });
+    if (typeof URLSearchParams !== 'undefined' && window.location.search) {
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('deleted') === '1' && window.appToast) {
+            appToast({ type: 'success', text: 'Question deleted.' });
+            params.delete('deleted');
+            var newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+            window.history.replaceState({}, '', newUrl);
+        }
+    }
+})();
+</script>
 
 <?php
 $content = ob_get_clean();

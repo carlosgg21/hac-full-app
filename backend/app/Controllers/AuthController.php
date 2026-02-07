@@ -1,6 +1,7 @@
 <?php
 /**
  * H.A.C. Renovation - AuthController
+ * Punto único de lógica de autenticación (web y API).
  */
 
 class AuthController
@@ -18,61 +19,81 @@ class AuthController
     }
 
     /**
-     * Procesar login
+     * Intentar login (lógica compartida web + API).
+     * @return array ['success' => bool, 'user' => array|null, 'message' => string, 'code' => int]
      */
-    public function login()
+    public static function attemptLogin($username, $password)
     {
-        $username = $_POST['username'] ?? '';
-        $password = $_POST['password'] ?? '';
+        $username = trim($username ?? '');
+        $password = $password ?? '';
 
-        if (empty($username) || empty($password)) {
-            if (self::isApiRequest()) {
-                Response::error('Username and password are required');
-            } else {
-                $_SESSION['error'] = 'Username and password are required';
-                Response::redirect('/login');
-            }
+        if ($username === '' || $password === '') {
+            return [
+                'success' => false,
+                'user' => null,
+                'message' => 'Username and password are required',
+                'code' => 400,
+            ];
         }
 
         $user = User::authenticate($username, $password);
 
         if ($user) {
             Auth::login($user);
-            
-            if (self::isApiRequest()) {
-                Response::success('Login successful', ['user' => Auth::user()]);
-            } else {
-                // Debug antes de redirect
-                if (defined('APP_ENV') && APP_ENV === 'development') {
-                    error_log("AuthController::login - Antes de redirect");
-                    error_log("AuthController::login - REQUEST_URI: " . ($_SERVER['REQUEST_URI'] ?? 'N/A'));
-                    error_log("AuthController::login - SCRIPT_NAME: " . ($_SERVER['SCRIPT_NAME'] ?? 'N/A'));
-                    error_log("AuthController::login - BASE_PATH_URL: " . (defined('BASE_PATH_URL') ? BASE_PATH_URL : 'NO DEFINIDA'));
-                }
-                Response::redirect('/dashboard');
-            }
-        } else {
-            if (self::isApiRequest()) {
-                Response::error('Invalid credentials', null, 401);
-            } else {
-                $_SESSION['error'] = 'Invalid credentials';
-                Response::redirect('/login');
-            }
+            return [
+                'success' => true,
+                'user' => Auth::user(),
+                'message' => 'Login successful',
+                'code' => 200,
+            ];
         }
+
+        return [
+            'success' => false,
+            'user' => null,
+            'message' => 'Invalid credentials',
+            'code' => 401,
+        ];
     }
 
     /**
-     * Cerrar sesión
+     * Procesar login (web o API según petición)
+     */
+    public function login()
+    {
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+
+        $result = self::attemptLogin($username, $password);
+
+        if (self::isApiRequest()) {
+            if ($result['success']) {
+                Response::success($result['message'], ['user' => $result['user']], $result['code']);
+            }
+            Response::error($result['message'], null, $result['code']);
+        }
+
+        if ($result['success']) {
+            Response::redirect('/dashboard');
+        }
+
+        $_SESSION['error'] = $result['message'];
+        Response::redirect('/login');
+    }
+
+    /**
+     * Cerrar sesión (web o API según petición)
      */
     public function logout()
     {
         Auth::logout();
-        
+
         if (self::isApiRequest()) {
             Response::success('Session closed');
-        } else {
-            Response::redirect('/login');
+            return;
         }
+
+        Response::redirect('/login');
     }
 
     /**

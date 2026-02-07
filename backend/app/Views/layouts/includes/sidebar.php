@@ -63,11 +63,7 @@ function isActive($page) {
         <i class="bi bi-receipt text-base"></i>
         Quotes
       </a>
-      <a href="<?= Response::url('/projects') ?>" class="flex items-center px-3 py-2.5 rounded-lg <?= isActive('projects') ?> gap-2.5 font-medium text-sm hover:bg-white/20 transition">
-        <!-- Projects Icon -->
-        <i class="bi bi-folder text-base"></i>
-        Projects
-      </a>
+     
       <a href="<?= Response::url('/questions') ?>" class="flex items-center px-3 py-2.5 rounded-lg <?= isActive('questions') ?> gap-2.5 font-medium text-sm hover:bg-white/20 transition">
         <!-- Questions Icon -->
         <i class="bi bi-chat-left-text text-base"></i>

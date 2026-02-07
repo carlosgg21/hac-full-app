@@ -177,8 +177,7 @@ class QuoteController
         if (self::isApiRequest()) {
             Response::success('Quote deleted');
         } else {
-            $_SESSION['success'] = 'Quote deleted successfully';
-            Response::redirect('/quotes');
+            Response::redirect('/quotes?deleted=1');
         }
     }
 
