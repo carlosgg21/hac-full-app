@@ -6,12 +6,58 @@
 class Quote
 {
     /**
-     * Obtener todas las cotizaciones
+     * Definición de estados de cotización (label, class CSS, icon) para uso en vistas
+     *
+     * @return array<string, array{label: string, class: string, icon: string}>
      */
-    public static function all()
+    public static function getStatuses()
+    {
+        return [
+            'draft'    => ['label' => 'Draft',    'class' => 'bg-gray-100 text-gray-700',   'icon' => 'bi-file-earmark'],
+            'pending'  => ['label' => 'Pending',  'class' => 'bg-yellow-100 text-yellow-700', 'icon' => 'bi-clock'],
+            'sent'     => ['label' => 'Sent',     'class' => 'bg-green-100 text-green-700',  'icon' => 'bi-send'],
+            'accepted' => ['label' => 'Accepted', 'class' => 'bg-green-100 text-green-700', 'icon' => 'bi-check-circle'],
+            'rejected' => ['label' => 'Rejected', 'class' => 'bg-red-100 text-red-700',     'icon' => 'bi-x-circle'],
+            'expired'  => ['label' => 'Expired',  'class' => 'bg-red-100 text-red-600',     'icon' => 'bi-calendar-x'],
+        ];
+    }
+
+    /**
+     * Obtener la config de un estado (label, class, icon). Fallback a draft si no existe.
+     *
+     * @param string $status
+     * @return array{label: string, class: string, icon: string}
+     */
+    public static function getStatusConfig($status)
+    {
+        $statuses = self::getStatuses();
+        $status = strtolower($status ?? '');
+        return $statuses[$status] ?? $statuses['draft'];
+    }
+
+    /**
+     * Total de cotizaciones (opcional filtro por status y búsqueda)
+     */
+    public static function count($status = null, $search = null)
     {
         $repo = new QuoteRepository();
-        return $repo->findWithClient();
+        $conditions = $status !== null && $status !== '' ? ['status' => $status] : [];
+        return $repo->getCount($conditions, $search);
+    }
+
+    /**
+     * Obtener todas las cotizaciones
+     *
+     * @param string|null $orderBy quote_number, client_name, status, total_amount, created_at
+     * @param string $orderDir asc|desc
+     * @param int|null $limit
+     * @param int $offset
+     * @param string|null $search Búsqueda por número o cliente
+     */
+    public static function all($orderBy = null, $orderDir = 'desc', $limit = null, $offset = 0, $search = null)
+    {
+        $repo = new QuoteRepository();
+        return $repo->findWithClient([], $limit, $offset, $orderBy, $orderDir, $search);
     }
 
     /**
@@ -49,11 +95,17 @@ class Quote
 
     /**
      * Buscar por estado
+     *
+     * @param string|null $orderBy quote_number, client_name, status, total_amount, created_at
+     * @param string $orderDir asc|desc
+     * @param int|null $limit
+     * @param int $offset
+     * @param string|null $search Búsqueda por número o cliente
      */
-    public static function findByStatus($status)
+    public static function findByStatus($status, $orderBy = null, $orderDir = 'desc', $limit = null, $offset = 0, $search = null)
     {
         $repo = new QuoteRepository();
-        return $repo->findByStatus($status);
+        return $repo->findWithClient(['status' => $status], $limit, $offset, $orderBy, $orderDir, $search);
     }
 
     /**

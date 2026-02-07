@@ -31,10 +31,51 @@ class QuoteRepository extends BaseRepository
         return $this->findAll(['status' => $status], 'created_at DESC');
     }
 
+    /** Columnas permitidas para ordenar (campo => expresión SQL) */
+    private static $sortColumns = [
+        'quote_number' => 'q.quote_number',
+        'client_name'  => 'client_name',
+        'status'       => 'q.status',
+        'total_amount' => 'q.total_amount',
+        'created_at'   => 'q.created_at',
+    ];
+
+    /**
+     * Total de cotizaciones (opcional filtro por status y búsqueda)
+     */
+    public function getCount($conditions = [], $searchTerm = null)
+    {
+        $sql = "SELECT COUNT(*) as n FROM {$this->table} q INNER JOIN clients c ON q.client_id = c.id";
+        $params = [];
+        $where = [];
+
+        foreach ($conditions as $field => $value) {
+            $where[] = strpos($field, '.') !== false ? "{$field} = :{$field}" : "q.{$field} = :{$field}";
+            $params[$field] = $value;
+        }
+        if ($searchTerm !== null && $searchTerm !== '') {
+            $where[] = "(q.quote_number LIKE :search_term_1 OR CONCAT(c.first_name, ' ', c.last_name) LIKE :search_term_2)";
+            $params['search_term_1'] = '%' . $searchTerm . '%';
+            $params['search_term_2'] = '%' . $searchTerm . '%';
+        }
+        if (!empty($where)) {
+            $sql .= " WHERE " . implode(' AND ', $where);
+        }
+        $row = $this->db->fetchOne($sql, $params);
+        return (int)($row['n'] ?? 0);
+    }
+
     /**
      * Obtener cotizaciones con información del cliente
+     *
+     * @param array $conditions
+     * @param int|null $limit
+     * @param int $offset
+     * @param string|null $orderBy Campo permitido: quote_number, client_name, status, total_amount, created_at
+     * @param string $orderDir 'asc' o 'desc'
+     * @param string|null $searchTerm Búsqueda por quote_number o nombre de cliente
      */
-    public function findWithClient($conditions = [], $limit = null)
+    public function findWithClient($conditions = [], $limit = null, $offset = 0, $orderBy = null, $orderDir = 'desc', $searchTerm = null)
     {
         $sql = "SELECT q.*, 
                        c.id as client_id, 
@@ -59,15 +100,25 @@ class QuoteRepository extends BaseRepository
                 $params[$field] = $value;
             }
         }
+        if ($searchTerm !== null && $searchTerm !== '') {
+            $where[] = "(q.quote_number LIKE :search_term_1 OR CONCAT(c.first_name, ' ', c.last_name) LIKE :search_term_2)";
+            $params['search_term_1'] = '%' . $searchTerm . '%';
+            $params['search_term_2'] = '%' . $searchTerm . '%';
+        }
 
         if (!empty($where)) {
             $sql .= " WHERE " . implode(' AND ', $where);
         }
 
-        $sql .= " ORDER BY q.created_at DESC";
+        $orderDir = strtolower($orderDir) === 'asc' ? 'ASC' : 'DESC';
+        if ($orderBy !== null && isset(self::$sortColumns[$orderBy])) {
+            $sql .= " ORDER BY " . self::$sortColumns[$orderBy] . " " . $orderDir;
+        } else {
+            $sql .= " ORDER BY q.created_at DESC";
+        }
 
-        if ($limit) {
-            $sql .= " LIMIT {$limit}";
+        if ($limit !== null) {
+            $sql .= " LIMIT " . (int) $limit . " OFFSET " . (int) $offset;
         }
 
         return $this->db->fetchAll($sql, $params);

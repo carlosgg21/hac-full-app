@@ -338,6 +338,23 @@
         <?php if (!empty($layoutSuccessMessage)): ?>
         appToast({ type: 'success', text: <?= json_encode($layoutSuccessMessage) ?> });
         <?php endif; ?>
+        (function() {
+            var params = typeof URLSearchParams !== 'undefined' && window.location.search ? new URLSearchParams(window.location.search) : null;
+            if (params) {
+                if (params.get('updated') === '1') {
+                    appToast({ type: 'success', text: 'Quote status updated.' });
+                }
+                if (params.get('deleted') === '1') {
+                    appToast({ type: 'success', text: 'Quote deleted.' });
+                }
+                if (params.get('updated') === '1' || params.get('deleted') === '1') {
+                    params.delete('updated');
+                    params.delete('deleted');
+                    var newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                    window.history.replaceState({}, '', newUrl);
+                }
+            }
+        })();
     </script>
 </body>
 </html>

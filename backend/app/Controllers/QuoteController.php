@@ -13,23 +13,53 @@ class QuoteController
         Auth::requireAuth();
     }
 
+    /** Columnas por las que se puede ordenar el listado de quotes */
+    private static $indexSortColumns = ['quote_number', 'client_name', 'status', 'total_amount', 'created_at'];
+
     /**
-     * Listar cotizaciones
+     * Listar cotizaciones (referencia: ClientController index)
      */
     public function index()
     {
+        $search = trim($_GET['search'] ?? '');
         $status = $_GET['status'] ?? '';
-        
-        if ($status) {
-            $quotes = Quote::findByStatus($status);
+        $sort = $_GET['sort'] ?? 'created_at';
+        $order = strtolower($_GET['order'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
+        $page = max(1, (int)($_GET['page'] ?? 1));
+        $perPage = (int)($_GET['per_page'] ?? 10);
+        if (!in_array($perPage, [10, 15, 25], true)) {
+            $perPage = 10;
+        }
+        if (!in_array($sort, self::$indexSortColumns, true)) {
+            $sort = 'created_at';
+        }
+
+        $totalCount = Quote::count($status !== '' ? $status : null, $search !== '' ? $search : null);
+        $totalPages = $totalCount > 0 ? (int)ceil($totalCount / $perPage) : 1;
+        $page = min(max(1, $page), $totalPages);
+        $offset = ($page - 1) * $perPage;
+
+        if ($status !== '') {
+            $quotes = Quote::findByStatus($status, $sort, $order, $perPage, $offset, $search !== '' ? $search : null);
         } else {
-            $quotes = Quote::all();
+            $quotes = Quote::all($sort, $order, $perPage, $offset, $search !== '' ? $search : null);
         }
 
         if (self::isApiRequest()) {
             Response::success('Quotes retrieved', $quotes);
         } else {
-            Response::view('quotes/index', ['quotes' => $quotes, 'status' => $status]);
+            Response::view('quotes/index', [
+                'quotes' => $quotes,
+                'search' => $search,
+                'status' => $status,
+                'quoteStatuses' => Quote::getStatuses(),
+                'sort' => $sort,
+                'order' => $order,
+                'page' => $page,
+                'per_page' => $perPage,
+                'total_count' => $totalCount,
+                'total_pages' => $totalPages,
+            ]);
         }
     }
 
@@ -43,7 +73,8 @@ class QuoteController
         
         Response::view('quotes/create', [
             'clients' => $clients,
-            'questions' => $questions
+            'questions' => $questions,
+            'quoteStatuses' => Quote::getStatuses()
         ]);
     }
 
@@ -97,10 +128,15 @@ class QuoteController
             Response::notFound('Quote not found');
         }
 
+        if (!self::isApiRequest()) {
+            $client = Client::find($quote['client_id'] ?? 0);
+            $quote['client_name'] = $client ? trim(($client['first_name'] ?? '') . ' ' . ($client['last_name'] ?? '')) : 'N/A';
+        }
+
         if (self::isApiRequest()) {
             Response::success('Quote retrieved', $quote);
         } else {
-            Response::view('quotes/show', ['quote' => $quote]);
+            Response::view('quotes/show', ['quote' => $quote, 'quoteStatuses' => Quote::getStatuses()]);
         }
     }
 
@@ -121,7 +157,8 @@ class QuoteController
         Response::view('quotes/edit', [
             'quote' => $quote,
             'clients' => $clients,
-            'questions' => $questions
+            'questions' => $questions,
+            'quoteStatuses' => Quote::getStatuses()
         ]);
     }
 
@@ -136,12 +173,17 @@ class QuoteController
             Response::notFound('Quote not found');
         }
 
+        $validUntil = $_POST['valid_until'] ?? $quote['valid_until'];
+        if ($validUntil === '' || $validUntil === null) {
+            $validUntil = null;
+        }
+
         $data = [
             'client_id' => $_POST['client_id'] ?? $quote['client_id'],
             'status' => $_POST['status'] ?? $quote['status'],
             'total_amount' => $_POST['total_amount'] ?? $quote['total_amount'],
             'currency' => $_POST['currency'] ?? $quote['currency'],
-            'valid_until' => $_POST['valid_until'] ?? $quote['valid_until'],
+            'valid_until' => $validUntil,
             'notes' => $_POST['notes'] ?? $quote['notes'],
             'metadata' => isset($_POST['metadata']) ? json_encode($_POST['metadata']) : $quote['metadata']
         ];
@@ -157,7 +199,14 @@ class QuoteController
             Response::success('Quote updated');
         } else {
             $_SESSION['success'] = 'Quote updated successfully';
-            Response::redirect('/quotes/' . $id);
+            $indexUrl = Response::url('/quotes');
+            $redirectTo = $_POST['redirect_to'] ?? '';
+            if ($redirectTo !== '' && $redirectTo === $indexUrl) {
+                // Path sin base para que Response::redirect() no duplique el base path
+                Response::redirect('/quotes?updated=1');
+            } else {
+                Response::redirect('/quotes/' . $id);
+            }
         }
     }
 
