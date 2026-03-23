@@ -16,9 +16,25 @@ class QuestionController
     /**
      * Listar preguntas
      */
+    /** Columnas permitidas para ordenar */
+    private static $sortColumns = [
+        'id'           => 'q.id',
+        'service_name' => 's.name',
+        'question_text'=> 'q.question_text',
+        'question_type'=> 'q.question_type',
+        'order'        => 'q.`order`',
+        'is_active'    => 'q.is_active',
+    ];
+
     public function index()
     {
-        $questions = Question::all();
+        $serviceId = $_GET['service_id'] ?? null;
+        $search = trim($_GET['search'] ?? '');
+        $sortBy = $_GET['sort'] ?? 'id';
+        $sortDir = strtolower($_GET['dir'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
+
+        $repo = new QuestionRepository();
+        $questions = $repo->findFiltered($serviceId, $search, self::$sortColumns[$sortBy] ?? 'q.id', $sortDir);
         $services = Service::all();
 
         if (self::isApiRequest()) {
@@ -26,7 +42,13 @@ class QuestionController
         } else {
             Response::view('questions/index', [
                 'questions' => $questions,
-                'services' => $services
+                'services' => $services,
+                'filters' => [
+                    'service_id' => $serviceId,
+                    'search' => $search,
+                    'sort' => $sortBy,
+                    'dir' => $sortDir,
+                ],
             ]);
         }
     }

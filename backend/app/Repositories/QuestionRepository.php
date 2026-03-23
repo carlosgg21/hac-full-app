@@ -81,6 +81,35 @@ class QuestionRepository extends BaseRepository
     }
 
     /**
+     * Buscar preguntas con filtros, búsqueda y orden
+     */
+    public function findFiltered($serviceId = null, $search = '', $orderByCol = 'q.id', $orderDir = 'desc')
+    {
+        $sql = "SELECT q.*, s.name as service_name
+                FROM {$this->table} q
+                INNER JOIN services s ON q.service_id = s.id";
+        $params = [];
+        $where = [];
+
+        if ($serviceId) {
+            $where[] = "q.service_id = :service_id";
+            $params['service_id'] = $serviceId;
+        }
+        if ($search !== '') {
+            $where[] = "q.question_text LIKE :search";
+            $params['search'] = '%' . $search . '%';
+        }
+        if (!empty($where)) {
+            $sql .= " WHERE " . implode(' AND ', $where);
+        }
+
+        $dir = strtoupper($orderDir) === 'ASC' ? 'ASC' : 'DESC';
+        $sql .= " ORDER BY {$orderByCol} {$dir}";
+
+        return $this->db->fetchAll($sql, $params);
+    }
+
+    /**
      * Reordenar preguntas
      */
     public function reorder($questionIds)

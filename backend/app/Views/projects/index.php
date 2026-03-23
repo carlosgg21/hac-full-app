@@ -19,7 +19,7 @@ ob_start();
     </div>
 </div>
 
-<section class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full overflow-x-auto">
+<section class="bg-white rounded-xl shadow-sm border border-gray-200 w-full">
     <table class="min-w-full">
         <thead>
             <tr class="bg-gray-50/80 text-gray-600 border-b border-gray-200">
@@ -99,10 +99,10 @@ ob_start();
                         <td class="py-3.5 px-5 text-sm text-gray-600">$<?= number_format($project['budget'] ?? 0, 2) ?></td>
                         <td class="py-3.5 px-5 text-right">
                             <div class="relative inline-block group">
-                                <button type="button" class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/20 transition" aria-label="Actions" aria-haspopup="true" onclick="var m=this.nextElementSibling; document.querySelectorAll('.project-actions-menu').forEach(function(x){if(x!==m)x.classList.add('hidden');}); m.classList.toggle('hidden');">
+                                <button type="button" class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/20 transition" aria-label="Actions" aria-haspopup="true" >
                                     <i class="bi bi-three-dots-vertical text-lg"></i>
                                 </button>
-                                <div class="project-actions-menu hidden absolute right-0 top-full mt-1 py-1 min-w-[140px] bg-white rounded-xl shadow-lg border border-gray-200 z-20">
+                                <div class="project-actions-menu hidden absolute right-0 py-1 min-w-[140px] bg-white rounded-xl shadow-lg border border-gray-200 z-20">
                                     <a href="<?= Response::url('/projects/' . $project['id']) ?>" class="flex items-center gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-xl">
                                         <i class="bi bi-eye text-gray-500"></i>
                                         Show
@@ -117,15 +117,6 @@ ob_start();
     </table>
 </section>
 
-<script>
-(function() {
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.relative.inline-block.group')) {
-            document.querySelectorAll('.project-actions-menu').forEach(function(m) { m.classList.add('hidden'); });
-        }
-    });
-})();
-</script>
 
 <?php
 $content = ob_get_clean();

@@ -338,6 +338,47 @@
         <?php if (!empty($layoutSuccessMessage)): ?>
         appToast({ type: 'success', text: <?= json_encode($layoutSuccessMessage) ?> });
         <?php endif; ?>
+        // Auto-position action dropdowns (open upward if near bottom)
+        (function() {
+            function findAllMenus() {
+                return document.querySelectorAll('[aria-haspopup="true"] + div');
+            }
+            function closeAllMenus(except) {
+                findAllMenus().forEach(function(m) {
+                    if (m !== except) m.classList.add('hidden');
+                });
+            }
+            document.addEventListener('click', function(e) {
+                var btn = e.target.closest('button[aria-haspopup="true"]');
+
+                if (!btn) {
+                    closeAllMenus();
+                    return;
+                }
+
+                var menu = btn.nextElementSibling;
+                if (!menu) return;
+
+                // Close all other menus
+                closeAllMenus(menu);
+
+                // Toggle this menu
+                menu.classList.toggle('hidden');
+                if (menu.classList.contains('hidden')) return;
+
+                // Reset position
+                menu.classList.remove('bottom-full', 'top-full', 'mb-1', 'mt-1');
+
+                // Default: open downward, then check
+                menu.classList.add('top-full', 'mt-1');
+                var rect = menu.getBoundingClientRect();
+                if (rect.bottom > window.innerHeight - 10) {
+                    menu.classList.remove('top-full', 'mt-1');
+                    menu.classList.add('bottom-full', 'mb-1');
+                }
+            });
+        })();
+
         (function() {
             var params = typeof URLSearchParams !== 'undefined' && window.location.search ? new URLSearchParams(window.location.search) : null;
             if (params) {

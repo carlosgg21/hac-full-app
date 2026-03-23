@@ -128,7 +128,7 @@ ob_start();
 <?php endif; ?>
 
 <!-- Quotes Table -->
-<section class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full overflow-x-auto">
+<section class="bg-white rounded-xl shadow-sm border border-gray-200 w-full">
     <table class="min-w-full">
         <thead>
             <tr class="bg-gray-50/80 text-gray-600 border-b border-gray-200">
