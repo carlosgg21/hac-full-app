@@ -18,27 +18,45 @@ class AdminController
      */
     public function dashboard()
     {
+        $db = Database::getInstance();
+
+        $quoteRepo = new QuoteRepository();
+
         // Estadísticas
         $stats = [
             'total_clients' => (new ClientRepository())->count(),
-            'total_quotes' => (new QuoteRepository())->count(),
-            'pending_quotes' => (new QuoteRepository())->count(['status' => 'pending']),
-            'total_projects' => (new ProjectRepository())->count(),
-            'active_projects' => (new ProjectRepository())->count(['status' => 'in_progress'])
+            'total_quotes' => $quoteRepo->count(),
+            'pending_quotes' => $quoteRepo->count(['status' => 'pending']),
+            'accepted_quotes' => $quoteRepo->count(['status' => 'accepted']),
+            'rejected_quotes' => $quoteRepo->count(['status' => 'rejected']),
         ];
 
-        // Cotizaciones recientes
-        $recentQuotes = Quote::all();
-        $recentQuotes = array_slice($recentQuotes, 0, 5);
+        // Cotizaciones por tipo de servicio (del campo JSON metadata)
+        $serviceStats = $db->fetchAll(
+            "SELECT JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.service_type')) as service_type, COUNT(*) as total
+             FROM quotes
+             WHERE metadata IS NOT NULL AND JSON_EXTRACT(metadata, '$.service_type') IS NOT NULL
+             GROUP BY service_type
+             ORDER BY total DESC"
+        );
 
-        // Proyectos recientes
-        $recentProjects = Project::all();
-        $recentProjects = array_slice($recentProjects, 0, 5);
+        // Clientes por mes (año actual)
+        $clientsByMonth = $db->fetchAll(
+            "SELECT MONTH(created_at) as month, COUNT(*) as total
+             FROM clients
+             WHERE YEAR(created_at) = YEAR(CURDATE())
+             GROUP BY MONTH(created_at)
+             ORDER BY month"
+        );
+
+        // Cotizaciones recientes
+        $recentQuotes = $quoteRepo->findWithClient([], 5, 0, 'q.created_at', 'desc');
 
         Response::view('admin/dashboard', [
             'stats' => $stats,
+            'serviceStats' => $serviceStats,
+            'clientsByMonth' => $clientsByMonth,
             'recentQuotes' => $recentQuotes,
-            'recentProjects' => $recentProjects
         ]);
     }
 }

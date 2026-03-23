@@ -26,16 +26,6 @@ ob_start();
         </div>
         <i class="bi bi-chevron-right text-gray-400 flex-shrink-0"></i>
     </a>
-    <a href="<?= Response::url('/reports/projects') ?>" class="flex items-center gap-4 p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-primary/30 hover:shadow-md transition">
-        <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-            <i class="bi bi-folder text-xl"></i>
-        </div>
-        <div class="flex-1 min-w-0">
-            <h3 class="text-lg font-semibold text-gray-800 mb-1">Projects Report</h3>
-            <p class="text-sm text-gray-600">View projects statistics and analysis</p>
-        </div>
-        <i class="bi bi-chevron-right text-gray-400 flex-shrink-0"></i>
-    </a>
 </div>
 
 <?php

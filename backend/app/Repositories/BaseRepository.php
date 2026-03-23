@@ -23,13 +23,13 @@ class BaseRepository
      */
     public function findAll($conditions = [], $orderBy = null, $limit = null)
     {
-        $sql = "SELECT * FROM {$this->table}";
+        $sql = "SELECT * FROM `{$this->table}`";
         $params = [];
 
         if (!empty($conditions)) {
             $where = [];
             foreach ($conditions as $field => $value) {
-                $where[] = "{$field} = :{$field}";
+                $where[] = "`{$field}` = :{$field}";
                 $params[$field] = $value;
             }
             $sql .= " WHERE " . implode(' AND ', $where);
@@ -51,7 +51,7 @@ class BaseRepository
      */
     public function findById($id)
     {
-        $sql = "SELECT * FROM {$this->table} WHERE {$this->primaryKey} = :id";
+        $sql = "SELECT * FROM `{$this->table}` WHERE `{$this->primaryKey}` = :id";
         return $this->db->fetchOne($sql, ['id' => $id]);
     }
 
@@ -64,11 +64,11 @@ class BaseRepository
         $params = [];
 
         foreach ($conditions as $field => $value) {
-            $where[] = "{$field} = :{$field}";
+            $where[] = "`{$field}` = :{$field}";
             $params[$field] = $value;
         }
 
-        $sql = "SELECT * FROM {$this->table} WHERE " . implode(' AND ', $where) . " LIMIT 1";
+        $sql = "SELECT * FROM `{$this->table}` WHERE " . implode(' AND ', $where) . " LIMIT 1";
         return $this->db->fetchOne($sql, $params);
     }
 
@@ -101,13 +101,13 @@ class BaseRepository
      */
     public function count($conditions = [])
     {
-        $sql = "SELECT COUNT(*) as total FROM {$this->table}";
+        $sql = "SELECT COUNT(*) as total FROM `{$this->table}`";
         $params = [];
 
         if (!empty($conditions)) {
             $where = [];
             foreach ($conditions as $field => $value) {
-                $where[] = "{$field} = :{$field}";
+                $where[] = "`{$field}` = :{$field}";
                 $params[$field] = $value;
             }
             $sql .= " WHERE " . implode(' AND ', $where);

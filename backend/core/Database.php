@@ -106,14 +106,17 @@ class Database
     public function insert($table, $data)
     {
         $fields = array_keys($data);
+        $escapedFields = array_map(function($field) {
+            return '`' . str_replace('`', '``', $field) . '`';
+        }, $fields);
         $placeholders = array_map(function($field) {
             return ':' . $field;
         }, $fields);
 
         $sql = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
-            $table,
-            implode(', ', $fields),
+            '`' . str_replace('`', '``', $table) . '`',
+            implode(', ', $escapedFields),
             implode(', ', $placeholders)
         );
 
@@ -156,7 +159,8 @@ class Database
      */
     public function delete($table, $where, $params = [])
     {
-        $sql = sprintf('DELETE FROM %s WHERE %s', $table, $where);
+        $escapedTable = '`' . str_replace('`', '``', $table) . '`';
+        $sql = sprintf('DELETE FROM %s WHERE %s', $escapedTable, $where);
         $stmt = $this->query($sql, $params);
         return $stmt->rowCount();
     }

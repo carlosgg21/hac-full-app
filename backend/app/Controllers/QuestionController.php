@@ -51,8 +51,8 @@ class QuestionController
             'question_text' => $_POST['question_text'] ?? '',
             'question_type' => $_POST['question_type'] ?? 'text',
             'is_required' => isset($_POST['is_required']) ? 1 : 0,
-            'order' => $_POST['order'] ?? null,
-            'form_position' => $_POST['form_position'] ?? 1,
+            'order' => (int)($_POST['order'] ?? 0) ?: 0,
+            'form_position' => (int)($_POST['form_position'] ?? 1) ?: 1,
             'is_active' => isset($_POST['is_active']) ? 1 : 0
         ];
 
