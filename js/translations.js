@@ -20,24 +20,17 @@ const translations = {
     about_stat3: "Client Satisfaction",
     services_title: "Our Services",
     services_subtitle: "Comprehensive construction and renovation solutions for your project needs",
-    service1_title: "Interior Demolition",
-    service1_desc:
-      "Safe and efficient demolition services to prepare your space for renovation. We handle all debris removal and site preparation.",
-    service2_title: "Framing & Structure",
-    service2_desc:
-      "Expert framing services for walls, ceilings, and structural modifications. Quality craftsmanship ensuring stability and code compliance.",
-    service3_title: "Plaster & Painting",
-    service3_desc:
-      "Professional drywall installation, plastering, and painting services. Smooth finishes and vibrant colors to bring your vision to life.",
-    service4_title: "Patio & Fencing",
-    service4_desc:
-      "Custom outdoor living spaces with beautiful patios and secure fencing. Enhance your property's curb appeal and functionality.",
-    service5_title: "Concrete Work",
-    service5_desc:
-      "Durable concrete solutions for foundations, driveways, walkways, and more. Precision work that stands the test of time.",
-    service6_title: "Floors & Tiling",
-    service6_desc:
-      "Expert installation of hardwood, laminate, tile, and more. Beautiful floors that combine style with durability.",
+    services_residential: "Residential",
+    services_commercial: "Commercial",
+    svc_bathrooms: "Bathrooms",
+    svc_kitchens: "Kitchens",
+    svc_basement: "Basement",
+    svc_apartments: "Apartments",
+    svc_houses: "Houses",
+    svc_interior_systems: "Interior Systems",
+    svc_framing: "Framing",
+    svc_drywall: "Drywall",
+    svc_suspended_ceiling: "Suspended Ceiling",
     portfolio_title: "Our Work",
     portfolio_subtitle: "See the transformations we've accomplished for our satisfied clients",
     portfolio_before: "Before",
@@ -134,24 +127,17 @@ const translations = {
     about_stat3: "Satisfaction Client",
     services_title: "Nos Services",
     services_subtitle: "Solutions complètes de construction et de rénovation pour les besoins de votre projet",
-    service1_title: "Démolition Intérieure",
-    service1_desc:
-      "Services de démolition sûrs et efficaces pour préparer votre espace à la rénovation. Nous gérons tous les enlèvements de débris et la préparation du site.",
-    service2_title: "Charpente et Structure",
-    service2_desc:
-      "Services de charpenterie experts pour murs, plafonds et modifications structurelles. Savoir-faire de qualité assurant stabilité et conformité aux codes.",
-    service3_title: "Plâtre et Peinture",
-    service3_desc:
-      "Installation professionnelle de plaques de plâtre, plâtrage et services de peinture. Finitions lisses et couleurs éclatantes pour donner vie à votre vision.",
-    service4_title: "Patio et Clôture",
-    service4_desc:
-      "Espaces extérieurs personnalisés avec de beaux patios et des clôtures sécurisées. Améliorez l'attrait et la fonctionnalité de votre propriété.",
-    service5_title: "Travaux en Béton",
-    service5_desc:
-      "Solutions de béton durables pour fondations, allées, trottoirs et plus. Travail de précision qui résiste à l'épreuve du temps.",
-    service6_title: "Planchers et Carrelage",
-    service6_desc:
-      "Installation experte de bois franc, stratifié, carreaux et plus. De beaux planchers qui allient style et durabilité.",
+    services_residential: "Résidentiel",
+    services_commercial: "Commercial",
+    svc_bathrooms: "Salles de Bain",
+    svc_kitchens: "Cuisines",
+    svc_basement: "Sous-sol",
+    svc_apartments: "Appartements",
+    svc_houses: "Maisons",
+    svc_interior_systems: "Systèmes Intérieurs",
+    svc_framing: "Charpente",
+    svc_drywall: "Placoplâtre",
+    svc_suspended_ceiling: "Plafond Suspendu",
     portfolio_title: "Notre Travail",
     portfolio_subtitle: "Découvrez les transformations que nous avons réalisées pour nos clients satisfaits",
     portfolio_before: "Avant",

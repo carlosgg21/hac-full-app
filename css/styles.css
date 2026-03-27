@@ -410,6 +410,75 @@ select.service-locked {
   }
 }
 
+/* About Section - Scroll Animations */
+.about-text {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.about-text.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.about-image {
+  opacity: 0;
+  transform: translateX(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.about-image.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.about-stat {
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.about-stat.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Service Panels - Scroll Reveal */
+.service-panel {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.service-panel.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.service-chip {
+  opacity: 0;
+  transform: scale(0.9);
+  animation: none;
+}
+
+.service-panel.visible .service-chip {
+  animation: chipIn 0.4s ease forwards;
+}
+
+.service-panel.visible .service-chip:nth-child(1) { animation-delay: 0.1s; }
+.service-panel.visible .service-chip:nth-child(2) { animation-delay: 0.18s; }
+.service-panel.visible .service-chip:nth-child(3) { animation-delay: 0.26s; }
+.service-panel.visible .service-chip:nth-child(4) { animation-delay: 0.34s; }
+.service-panel.visible .service-chip:nth-child(5) { animation-delay: 0.42s; }
+
+@keyframes chipIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* Dynamic Content Loading Animation */
 /* Ocultar elementos dinámicos completamente hasta que se carguen */
 .dynamic-content {

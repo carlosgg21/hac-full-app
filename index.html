@@ -117,9 +117,9 @@
                 <!-- Desktop Navigation -->
                 <nav class="hidden lg:flex items-center space-x-8">
                     <a href="#about" class="nav-link text-sm font-medium text-gray-900 hover:text-accent transition-colors" data-translate="nav_about">About</a>
-                    <a href="#services" class="nav-link text-sm font-medium text-gray-900 hover:text-accent transition-colors" data-translate="nav_services">Services</a>
                     <a href="#portfolio" class="nav-link text-sm font-medium text-gray-900 hover:text-accent transition-colors" data-translate="nav_portfolio">Portfolio</a>
-                    <!-- <a href="#contact" class="nav-link text-sm font-medium text-gray-900 hover:text-accent transition-colors" data-translate="nav_contact">Contact</a> -->
+                    <a href="#services" class="nav-link text-sm font-medium text-gray-900 hover:text-accent transition-colors" data-translate="nav_services">Services</a>                    
+                    <a href="#contact" class="nav-link text-sm font-medium text-gray-900 hover:text-accent transition-colors" data-translate="nav_contact">Contact</a>
                     
                     <!-- Language toggle button for EN/FR only -->
                     <button id="langToggle" class="flex items-center space-x-2 px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors">
@@ -147,9 +147,9 @@
             <nav id="mobileMenu" class="hidden lg:hidden py-4 border-t border-gray-200">
                 <div class="flex flex-col space-y-4">
                     <a href="#about" class="mobile-nav-link text-sm font-medium text-gray-900 hover:text-accent transition-colors" data-translate="nav_about">About</a>
-                    <a href="#services" class="mobile-nav-link text-sm font-medium text-gray-900 hover:text-accent transition-colors" data-translate="nav_services">Services</a>
                     <a href="#portfolio" class="mobile-nav-link text-sm font-medium text-gray-900 hover:text-accent transition-colors" data-translate="nav_portfolio">Portfolio</a>
-                    <!-- <a href="#contact" class="mobile-nav-link text-sm font-medium text-gray-900 hover:text-accent transition-colors" data-translate="nav_contact">Contact</a> -->
+                    <a href="#services" class="mobile-nav-link text-sm font-medium text-gray-900 hover:text-accent transition-colors" data-translate="nav_services">Services</a>                   
+                    <a href="#contact" class="mobile-nav-link text-sm font-medium text-gray-900 hover:text-accent transition-colors" data-translate="nav_contact">Contact</a>
                     
                     <!-- Mobile language toggle -->
                     <div class="pt-2 border-t border-gray-200">
@@ -193,7 +193,7 @@
     <section id="about" class="py-20 bg-white">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div>
+                <div class="about-text">
                     <h2 class="font-serif text-4xl md:text-5xl font-bold text-primary mb-6" data-translate="about_title">
                         About H.A.C. Renovation
                     </h2>
@@ -204,23 +204,23 @@
                         Our team of skilled professionals is committed to delivering high-quality results on time and within budget. From initial consultation to project completion, we work closely with our clients to ensure their vision becomes reality.
                     </p>
                     <div class="grid grid-cols-3 gap-6">
-                        <div class="text-center">
-                            <div id="yearsExperience" class="text-4xl font-bold text-accent mb-2 dynamic-content">5+</div>
+                        <div class="about-stat text-center">
+                            <div id="yearsExperience" class="text-4xl font-bold text-accent mb-2 dynamic-content" data-count="5" data-suffix="+">5+</div>
                             <div class="text-sm text-gray-600 uppercase" data-translate="about_stat1">Years Experience</div>
                         </div>
-                        <div class="text-center">
-                            <div id="totalProjects" class="text-4xl font-bold text-accent mb-2 dynamic-content">100+</div>
+                        <div class="about-stat text-center">
+                            <div id="totalProjects" class="text-4xl font-bold text-accent mb-2 dynamic-content" data-count="100" data-suffix="+">100+</div>
                             <div class="text-sm text-gray-600 uppercase" data-translate="about_stat2">Projects Completed</div>
                         </div>
-                        <div class="text-center">
-                            <div id="clientSatisfaction" class="text-4xl font-bold text-accent mb-2 dynamic-content">99%</div>
+                        <div class="about-stat text-center">
+                            <div id="clientSatisfaction" class="text-4xl font-bold text-accent mb-2 dynamic-content" data-count="99" data-suffix="%">99%</div>
                             <div class="text-sm text-gray-600 uppercase" data-translate="about_stat3">Client Satisfaction</div>
                         </div>
                     </div>
                 </div>
-                <div class="relative">
-                    <img src="public/about_us.jpeg" 
-                         alt="Our team at work" 
+                <div class="about-image relative">
+                    <img src="public/about_us.jpeg"
+                         alt="Our team at work"
                          width="600" height="400"
                          loading="lazy"
                          class="rounded-lg shadow-xl">
@@ -228,6 +228,59 @@
             </div>
         </div>
     </section>
+
+    <!-- About animations -->
+    <script>
+    (function() {
+        // Counter animation
+        function animateCount(el) {
+            var target = parseInt(el.getAttribute('data-count')) || 0;
+            var suffix = el.getAttribute('data-suffix') || '';
+            var duration = 1800;
+            var start = 0;
+            var startTime = null;
+            function step(ts) {
+                if (!startTime) startTime = ts;
+                var progress = Math.min((ts - startTime) / duration, 1);
+                var ease = 1 - Math.pow(1 - progress, 3);
+                var current = Math.floor(ease * target);
+                el.textContent = current + suffix;
+                if (progress < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        // Observe about section
+        var aboutObs = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (!entry.isIntersecting) return;
+
+                // Text slide in from left
+                var text = entry.target.querySelector('.about-text');
+                if (text) text.classList.add('visible');
+
+                // Image slide in from right
+                var img = entry.target.querySelector('.about-image');
+                if (img) setTimeout(function() { img.classList.add('visible'); }, 200);
+
+                // Stats stagger + counter
+                var stats = entry.target.querySelectorAll('.about-stat');
+                stats.forEach(function(stat, i) {
+                    setTimeout(function() {
+                        stat.classList.add('visible');
+                        var counter = stat.querySelector('[data-count]');
+                        if (counter) animateCount(counter);
+                    }, 600 + i * 150);
+                });
+
+                aboutObs.unobserve(entry.target);
+            });
+        }, { threshold: 0.2 });
+
+        var aboutSection = document.getElementById('about');
+        if (aboutSection) aboutObs.observe(aboutSection);
+    })();
+    </script>
 
     <!-- Portfolio Section -->
     <section id="portfolio" class="py-20 bg-white">
@@ -241,10 +294,10 @@
 
             <div class="grid md:grid-cols-2 gap-8">
                 <!-- Project 1 -->
-                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
+                <div class="portfolio-card bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
                     <div class="grid grid-cols-2 gap-0">
                         <div class="relative">
-                            <img src="public/before_01.jpg" 
+                            <img src="public/q_before.png" 
                                  alt="Before" 
                                  width="400" height="256" loading="lazy"
                                  class="w-full h-64 object-cover">
@@ -253,7 +306,7 @@
                             </div>
                         </div>
                         <div class="relative">
-                                   <img src="public/after_01.jpg"
+                                   <img src="public/q_aftet.png"
                                  alt="After" 
                                  width="400" height="256" loading="lazy"
                                  class="w-full h-64 object-cover">
@@ -272,10 +325,10 @@
                 </div>
 
                 <!-- Project 2 -->
-                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
+                <div class="portfolio-card bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
                     <div class="grid grid-cols-2 gap-0">
                         <div class="relative">
-                                  <img src="public/before_02.jpg"
+                                  <img src="public/b_before.png"
                                  alt="Before" 
                                  width="400" height="256" loading="lazy"
                                  class="w-full h-64 object-cover">
@@ -284,7 +337,7 @@
                             </div>
                         </div>
                         <div class="relative">
-                            <img src="public/after_02.jpg"
+                            <img src="public/b_aftet.png"
                                  alt="After" 
                                  width="400" height="256" loading="lazy"
                                  class="w-full h-64 object-cover">
@@ -302,175 +355,168 @@
                     </div>
                 </div>
 
-                <!-- Project 3 -->
+                <!-- Project 3 - Basement (commented: no questions yet)
                 <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
                     <div class="grid grid-cols-2 gap-0">
                         <div class="relative">
-                    <img src="public/before_03.jpg"
-                                 alt="Before" 
-                                 width="400" height="256" loading="lazy"
-                                 class="w-full h-64 object-cover">
-                            <div class="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_before">
-                                Before
-                            </div>
+                            <img src="public/before_03.jpg" alt="Before" width="400" height="256" loading="lazy" class="w-full h-64 object-cover">
+                            <div class="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_before">Before</div>
                         </div>
                         <div class="relative">
-                              <img src="public/after_03.jpg"
-                                 alt="After" 
-                                 width="400" height="256" loading="lazy"
-                                 class="w-full h-64 object-cover">
-                            <div class="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_after">
-                                After
-                            </div>
+                            <img src="public/after_03.jpg" alt="After" width="400" height="256" loading="lazy" class="w-full h-64 object-cover">
+                            <div class="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_after">After</div>
                         </div>
                     </div>
                     <div class="p-6">
                         <h3 class="text-xl font-bold text-primary mb-2" data-translate="project3_title">Basement Finishing</h3>
                         <p class="text-gray-600 mb-4" data-translate="project3_desc">Complete basement conversion into livable entertainment space</p>
-                        <button class="portfolio-quote-btn bg-accent text-white px-6 py-2 rounded-md font-medium hover:bg-accent-light transition-colors w-full" data-project="Basement Finishing" data-service-id="3" data-translate="form_get_quote">
-                            Get Free Quote
-                        </button>
+                        <button class="portfolio-quote-btn bg-accent text-white px-6 py-2 rounded-md font-medium hover:bg-accent-light transition-colors w-full" data-project="Basement Finishing" data-service-id="3" data-translate="form_get_quote">Get Free Quote</button>
                     </div>
                 </div>
+                -->
 
-                <!-- Project 4 -->
+                <!-- Project 4 - Patio (commented: no questions yet)
                 <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
                     <div class="grid grid-cols-2 gap-0">
                         <div class="relative">
-                                  <img src="public/before_04.jpg"
-                                 alt="Before" 
-                                 width="400" height="256" loading="lazy"
-                                 class="w-full h-64 object-cover">
-                            <div class="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_before">
-                                Before
-                            </div>
+                            <img src="public/before_04.jpg" alt="Before" width="400" height="256" loading="lazy" class="w-full h-64 object-cover">
+                            <div class="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_before">Before</div>
                         </div>
                         <div class="relative">
-                              <img src="public/after_04.jpg"
-                                 alt="After" 
-                                 width="400" height="256" loading="lazy"
-                                 class="w-full h-64 object-cover">
-                            <div class="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_after">
-                                After
-                            </div>
+                            <img src="public/after_04.jpg" alt="After" width="400" height="256" loading="lazy" class="w-full h-64 object-cover">
+                            <div class="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded text-sm font-semibold" data-translate="portfolio_after">After</div>
                         </div>
                     </div>
                     <div class="p-6">
                         <h3 class="text-xl font-bold text-primary mb-2" data-translate="project4_title">Patio Construction</h3>
                         <p class="text-gray-600 mb-4" data-translate="project4_desc">Custom outdoor patio with premium materials and landscaping</p>
-                        <button class="portfolio-quote-btn bg-accent text-white px-6 py-2 rounded-md font-medium hover:bg-accent-light transition-colors w-full" data-project="Patio Construction" data-service-id="4" data-translate="form_get_quote">
-                            Get Free Quote
-                        </button>
+                        <button class="portfolio-quote-btn bg-accent text-white px-6 py-2 rounded-md font-medium hover:bg-accent-light transition-colors w-full" data-project="Patio Construction" data-service-id="4" data-translate="form_get_quote">Get Free Quote</button>
                     </div>
                 </div>
+                -->
             </div>
         </div>
     </section>
 
- 
+    <!-- Portfolio scroll animation -->
+    <script>
+    (function() {
+        var obs = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('.portfolio-card').forEach(function(card, i) {
+            card.style.transitionDelay = i * 200 + 'ms';
+            obs.observe(card);
+        });
+    })();
+    </script>
+
     <!-- Services Section -->
     <section id="services" class="py-20 bg-gray-50">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
+            <div class="text-center mb-14">
                 <h2 class="font-serif text-4xl md:text-5xl font-bold text-primary mb-4" data-translate="services_title">Our Services</h2>
                 <p class="text-xl text-gray-600 max-w-2xl mx-auto" data-translate="services_subtitle">
                     Comprehensive construction and renovation solutions for your project needs
                 </p>
             </div>
 
-            <div id="servicesGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Service cards loaded from API (see main.js loadServicesFromAPI); fallback static cards below -->
-                <div class="bg-white rounded-lg shadow-md p-5 hover:shadow-xl transition-shadow">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                            </svg>
+            <!-- Residential -->
+            <div class="service-panel mb-12">
+                <div class="bg-accent/5 rounded-2xl p-8 md:p-10 border border-accent/10">
+                    <p class="text-xs font-bold uppercase tracking-widest text-accent mb-6" data-translate="services_residential">Residential</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                        <div class="service-chip flex flex-col items-center gap-3 bg-white rounded-xl p-5 shadow-sm border border-accent/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-default">
+                            <div class="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-700 text-center" data-translate="svc_bathrooms">Bathrooms</span>
                         </div>
-                        <h3 class="text-lg font-bold text-primary" data-translate="service1_title">Interior Demolition</h3>
+                        <div class="service-chip flex flex-col items-center gap-3 bg-white rounded-xl p-5 shadow-sm border border-accent/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-default">
+                            <div class="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-700 text-center" data-translate="svc_kitchens">Kitchens</span>
+                        </div>
+                        <div class="service-chip flex flex-col items-center gap-3 bg-white rounded-xl p-5 shadow-sm border border-accent/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-default">
+                            <div class="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-700 text-center" data-translate="svc_basement">Basement</span>
+                        </div>
+                        <div class="service-chip flex flex-col items-center gap-3 bg-white rounded-xl p-5 shadow-sm border border-accent/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-default">
+                            <div class="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-700 text-center" data-translate="svc_apartments">Apartments</span>
+                        </div>
+                        <div class="service-chip flex flex-col items-center gap-3 bg-white rounded-xl p-5 shadow-sm border border-accent/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-default">
+                            <div class="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-700 text-center" data-translate="svc_houses">Houses</span>
+                        </div>
                     </div>
-                    <p class="text-sm text-gray-600 leading-relaxed" data-translate="service1_desc">
-                        Safe and efficient demolition services to prepare your space for renovation. We handle all debris removal and site preparation.
-                    </p>
                 </div>
+            </div>
 
-                <!-- Service Card 2 -->
-                <div class="bg-white rounded-lg shadow-md p-5 hover:shadow-xl transition-shadow">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
-                            </svg>
+            <!-- Commercial -->
+            <div class="service-panel">
+                <div class="bg-primary/5 rounded-2xl p-8 md:p-10 border border-primary/10">
+                    <p class="text-xs font-bold uppercase tracking-widest text-primary mb-6" data-translate="services_commercial">Commercial</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="service-chip flex flex-col items-center gap-3 bg-white rounded-xl p-5 shadow-sm border border-primary/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-default">
+                            <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-700 text-center" data-translate="svc_interior_systems">Interior Systems</span>
                         </div>
-                        <h3 class="text-lg font-bold text-primary" data-translate="service2_title">Framing & Structure</h3>
-                    </div>
-                    <p class="text-sm text-gray-600 leading-relaxed" data-translate="service2_desc">
-                        Expert framing services for walls, ceilings, and structural modifications. Quality craftsmanship ensuring stability and code compliance.
-                    </p>
-                </div>
-
-                <!-- Service Card 3 -->
-                <div class="bg-white rounded-lg shadow-md p-5 hover:shadow-xl transition-shadow">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
-                            </svg>
+                        <div class="service-chip flex flex-col items-center gap-3 bg-white rounded-xl p-5 shadow-sm border border-primary/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-default">
+                            <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-700 text-center" data-translate="svc_framing">Framing</span>
                         </div>
-                        <h3 class="text-lg font-bold text-primary" data-translate="service3_title">Plaster & Painting</h3>
-                    </div>
-                    <p class="text-sm text-gray-600 leading-relaxed" data-translate="service3_desc">
-                        Professional drywall installation, plastering, and painting services. Smooth finishes and vibrant colors to bring your vision to life.
-                    </p>
-                </div>
-
-                <!-- Service Card 4 -->
-                <div class="bg-white rounded-lg shadow-md p-5 hover:shadow-xl transition-shadow">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                            </svg>
+                        <div class="service-chip flex flex-col items-center gap-3 bg-white rounded-xl p-5 shadow-sm border border-primary/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-default">
+                            <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path></svg>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-700 text-center" data-translate="svc_drywall">Drywall</span>
                         </div>
-                        <h3 class="text-lg font-bold text-primary" data-translate="service4_title">Patio & Fencing</h3>
-                    </div>
-                    <p class="text-sm text-gray-600 leading-relaxed" data-translate="service4_desc">
-                        Custom outdoor living spaces with beautiful patios and secure fencing. Enhance your property's curb appeal and functionality.
-                    </p>
-                </div>
-
-                <!-- Service Card 5 -->
-                <div class="bg-white rounded-lg shadow-md p-5 hover:shadow-xl transition-shadow">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
-                            </svg>
+                        <div class="service-chip flex flex-col items-center gap-3 bg-white rounded-xl p-5 shadow-sm border border-primary/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-default">
+                            <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 4h18M3 8h18M3 12h18M3 16h18M3 20h18"></path></svg>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-700 text-center" data-translate="svc_suspended_ceiling">Suspended Ceiling</span>
                         </div>
-                        <h3 class="text-lg font-bold text-primary" data-translate="service5_title">Concrete Work</h3>
                     </div>
-                    <p class="text-sm text-gray-600 leading-relaxed" data-translate="service5_desc">
-                        Durable concrete solutions for foundations, driveways, walkways, and more. Precision work that stands the test of time.
-                    </p>
-                </div>
-
-                <!-- Service Card 6 -->
-                <div class="bg-white rounded-lg shadow-md p-5 hover:shadow-xl transition-shadow">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-primary" data-translate="service6_title">Floors & Tiling</h3>
-                    </div>
-                    <p class="text-sm text-gray-600 leading-relaxed" data-translate="service6_desc">
-                        Expert installation of hardwood, laminate, tile, and more. Beautiful floors that combine style with durability.
-                    </p>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Services scroll animation -->
+    <script>
+    (function() {
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('.service-panel').forEach(function(panel, i) {
+            panel.style.transitionDelay = i * 200 + 'ms';
+            observer.observe(panel);
+        });
+    })();
+    </script>
 
 
     
