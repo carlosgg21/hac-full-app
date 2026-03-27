@@ -35,7 +35,7 @@ class QuestionController
 
         $repo = new QuestionRepository();
         $questions = $repo->findFiltered($serviceId, $search, self::$sortColumns[$sortBy] ?? 'q.id', $sortDir);
-        $services = Service::all();
+        $services = Service::active(['id', 'name']);
 
         if (self::isApiRequest()) {
             Response::success('Questions retrieved', $questions);
