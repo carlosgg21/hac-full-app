@@ -1,3 +1,6 @@
+# Configuración de base de datos
+backend/config/database.php
+
 # Archivos de entorno (crear .env.example como plantilla)
 .env
 .env.local
