@@ -123,10 +123,12 @@ class QuoteController
     public function show($id)
     {
         $quote = Quote::find($id);
-        
+
         if (!$quote) {
             Response::notFound('Quote not found');
         }
+
+        $this->markAsPendingIfDraft($id, $quote);
 
         if (!self::isApiRequest()) {
             $client = Client::find($quote['client_id'] ?? 0);
@@ -150,6 +152,8 @@ class QuoteController
         if (!$quote) {
             Response::notFound('Quote not found');
         }
+
+        $this->markAsPendingIfDraft($id, $quote);
 
         $clients = Client::all();
         $questions = Question::active();
@@ -251,6 +255,17 @@ class QuoteController
         } else {
             $_SESSION['success'] = 'Quote sent successfully';
             Response::redirect('/quotes/' . $id);
+        }
+    }
+
+    /**
+     * Draft → Pending cuando un admin abre el quote (show/edit)
+     */
+    private function markAsPendingIfDraft($id, array &$quote)
+    {
+        if (($quote['status'] ?? '') === 'draft') {
+            Quote::update($id, ['status' => 'pending']);
+            $quote['status'] = 'pending';
         }
     }
 

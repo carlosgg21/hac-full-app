@@ -16,7 +16,7 @@ class ServiceRepository extends BaseRepository
      * @param string|null $orderBy Orden (ej: 'name ASC', 'created_at DESC'). Si null o vacío, orden por name ASC
      * @return array
      */
-    public function findActive(array $fields = null, $orderBy = null)
+    public function findActive(?array $fields = null, $orderBy = null)
     {
         $select = '*';
         if ($fields !== null && !empty($fields)) {

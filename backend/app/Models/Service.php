@@ -32,7 +32,7 @@ class Service
      * @param array|null $fields Columnas a devolver (ej: ['id', 'name']). null = todas
      * @param string|null $orderBy Orden (ej: 'name ASC'). null = name ASC
      */
-    public static function active(array $fields = null, $orderBy = null)
+    public static function active(?array $fields = null, $orderBy = null)
     {
         return self::repo()->findActive($fields, $orderBy);
     }

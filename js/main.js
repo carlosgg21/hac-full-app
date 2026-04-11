@@ -24,14 +24,20 @@ async function loadCompanyData() {
     
     if (company && company.info) {
       const info = company.info;
-      
+
       // Actualizar valores ANTES de mostrar (mientras están ocultos)
       updateElement('yearsExperience', info.years_experience, '+');
       updateElement('totalProjects', info.total_projects, '+');
       updateElement('clientSatisfaction', info.client_satisfaction, '%', true);
     }
-    
+
+    // Señal para que el contador del About use los valores actualizados
+    window.__statsReady = true;
+    document.dispatchEvent(new CustomEvent('stats-ready'));
+
     updateFooterFromCompany(company);
+    updateTopBarFromCompany(company);
+    updateContactSectionFromCompany(company);
     
     // Revelar contenido con animación (pequeño delay para que el navegador procese los cambios)
     setTimeout(() => {
@@ -45,7 +51,11 @@ async function loadCompanyData() {
     
   } catch (error) {
     console.error('Error loading company data:', error);
-    
+
+    // En caso de error, permitir que el contador use los valores por defecto del HTML
+    window.__statsReady = true;
+    document.dispatchEvent(new CustomEvent('stats-ready'));
+
     // Mostrar footer estático (fade-in) cuando la API falla
     const footerContent = document.querySelector('.footer-content');
     if (footerContent) footerContent.classList.add('footer-loaded');
@@ -129,7 +139,17 @@ function updateFooterFromCompany(company) {
   }
 
   const addressEl = document.getElementById('footerAddress');
-  if (addressEl) addressEl.textContent = company.address != null ? escapeHtml(String(company.address)) : addressEl.textContent;
+  if (addressEl) {
+    const addr = (company.address != null && String(company.address).trim() !== '') ? String(company.address) : '';
+    if (addr) {
+      addressEl.textContent = addr;
+      const li = addressEl.closest('li');
+      if (li) li.style.display = '';
+    } else {
+      const li = addressEl.closest('li');
+      if (li) li.style.display = 'none';
+    }
+  }
 
   const socialEl = document.getElementById('footerSocial');
   if (socialEl && company.social_media && typeof company.social_media === 'object') {
@@ -163,6 +183,99 @@ function updateFooterFromCompany(company) {
   footerContent.classList.add('footer-loaded');
 }
 
+/**
+ * Actualiza la barra superior (top contact bar) en index.html
+ */
+function updateTopBarFromCompany(company) {
+  if (!company) return;
+
+  const phone1El = document.getElementById('topBarPhone1');
+  if (phone1El) {
+    const p = (company.phone || '').trim();
+    if (p) {
+      const digits = String(p).replace(/\D/g, '');
+      phone1El.href = 'tel:' + digits;
+      const span = phone1El.querySelector('span');
+      if (span) span.textContent = formatPhoneDisplay(p);
+      phone1El.style.display = '';
+    } else {
+      phone1El.style.display = 'none';
+    }
+  }
+
+  const phone2El = document.getElementById('topBarPhone2');
+  if (phone2El) {
+    const p2 = (company.other_phone_number || '').trim();
+    if (p2) {
+      const digits = String(p2).replace(/\D/g, '');
+      phone2El.href = 'tel:' + digits;
+      const span = phone2El.querySelector('span');
+      if (span) span.textContent = formatPhoneDisplay(p2);
+      phone2El.style.display = '';
+    } else {
+      phone2El.style.display = 'none';
+    }
+  }
+
+  const emailEl = document.getElementById('topBarEmail');
+  if (emailEl) {
+    const email = (company.email || '').trim();
+    if (email) {
+      emailEl.href = 'mailto:' + email;
+      const span = emailEl.querySelector('span');
+      if (span) span.textContent = email;
+      emailEl.style.display = '';
+    } else {
+      emailEl.style.display = 'none';
+    }
+  }
+
+  const addressEl = document.getElementById('topBarAddress');
+  if (addressEl) {
+    const addr = (company.address != null && String(company.address).trim() !== '') ? String(company.address) : '';
+    if (addr) {
+      const span = addressEl.querySelector('span');
+      if (span) span.textContent = addr;
+      addressEl.style.display = '';
+    } else {
+      addressEl.style.display = 'none';
+    }
+  }
+}
+
+/**
+ * Actualiza la sección Contact (Get in Touch) en index.html
+ */
+function updateContactSectionFromCompany(company) {
+  if (!company) return;
+
+  const phoneEl = document.getElementById('contactPhoneDisplay');
+  if (phoneEl) {
+    const phones = [company.phone, company.other_phone_number]
+      .filter(p => p && String(p).trim() !== '')
+      .map(p => formatPhoneDisplay(p));
+    if (phones.length) {
+      phoneEl.innerHTML = phones.map(p => escapeHtml(p)).join('<br>');
+    }
+  }
+
+  const emailEl = document.getElementById('contactEmailDisplay');
+  if (emailEl) {
+    const email = (company.email || '').trim();
+    if (email) emailEl.textContent = email;
+  }
+
+  const addressDisplayEl = document.getElementById('contactAddressDisplay');
+  const addressBlockEl = document.getElementById('contactAddressBlock');
+  const addr = (company.address != null && String(company.address).trim() !== '') ? String(company.address) : '';
+  if (addr) {
+    if (addressDisplayEl) addressDisplayEl.textContent = addr;
+    if (addressBlockEl) addressBlockEl.style.display = '';
+  } else {
+    if (addressBlockEl) addressBlockEl.style.display = 'none';
+  }
+}
+
 function formatPhoneDisplay(phone) {
   if (!phone) return '';
   const d = String(phone).replace(/\D/g, '');
@@ -177,10 +290,11 @@ function formatPhoneDisplay(phone) {
 function updateElement(id, value, suffix = '', isPercentage = false) {
   const el = document.getElementById(id)
   if (el && value !== undefined && value !== null) {
-    if (isPercentage) {
-      el.textContent = `${Math.round(value)}${suffix}`
-    } else {
-      el.textContent = `${value}${suffix}`
+    const num = isPercentage ? Math.round(value) : value
+    el.textContent = `${num}${suffix}`
+    // Sync data-count so the counter animation uses the API value, not the hardcoded default
+    if (el.hasAttribute('data-count')) {
+      el.setAttribute('data-count', num)
     }
   }
 }

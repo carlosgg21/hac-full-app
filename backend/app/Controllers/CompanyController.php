@@ -161,9 +161,12 @@ class CompanyController
             'acronym' => $_POST['acronym'] ?? $company['acronym'],
             'slogan' => $_POST['slogan'] ?? $company['slogan'],
             'code' => $_POST['code'] ?? $company['code'],
+            'rbq_number' => $_POST['rbq_number'] ?? $company['rbq_number'],
             'web_site' => $_POST['web_site'] ?? $company['web_site'],
             'email' => $_POST['email'] ?? $company['email'],
-            'phone' => $_POST['phone'] ?? $company['phone']
+            'phone' => $_POST['phone'] ?? $company['phone'],
+            'other_phone_number' => $_POST['other_phone_number'] ?? $company['other_phone_number'],
+            'address' => $_POST['address'] ?? $company['address']
         ];
 
         // Social media

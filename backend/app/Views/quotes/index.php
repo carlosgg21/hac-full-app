@@ -82,7 +82,7 @@ ob_start();
     <?php endif; ?>
 </form>
 
-<section class="bg-white rounded-xl shadow-sm border border-gray-200 w-full">
+<section class="bg-white rounded-xl shadow-sm border border-gray-200 w-full" style="overflow: visible;">
     <table class="min-w-full">
         <thead>
             <tr class="bg-gray-50/80 text-gray-600 border-b border-gray-200">
